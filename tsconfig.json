@@ -1,0 +1,3 @@
+{
+  "extends": "@qianmo-family-insurance/config/tsconfig.base.json"
+}

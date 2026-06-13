@@ -1,0 +1,24 @@
+{
+  "name": "@qianmo-family-insurance/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@qianmo-family-insurance/db": "workspace:*",
+    "@qianmo-family-insurance/env": "workspace:*",
+    "better-auth": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@qianmo-family-insurance/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

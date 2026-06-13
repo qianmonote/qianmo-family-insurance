@@ -1,0 +1,36 @@
+{
+  "name": "qianmo-family-insurance",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "check-types": "turbo check-types",
+    "dev:web": "turbo -F web dev",
+    "dev:server": "turbo -F server dev",
+    "db:push": "turbo -F @qianmo-family-insurance/db db:push",
+    "db:studio": "turbo -F @qianmo-family-insurance/db db:studio",
+    "db:generate": "turbo -F @qianmo-family-insurance/db db:generate",
+    "db:migrate": "turbo -F @qianmo-family-insurance/db db:migrate",
+    "db:start": "turbo -F @qianmo-family-insurance/db db:start",
+    "db:watch": "turbo -F @qianmo-family-insurance/db db:watch",
+    "db:stop": "turbo -F @qianmo-family-insurance/db db:stop",
+    "db:down": "turbo -F @qianmo-family-insurance/db db:down"
+  },
+  "dependencies": {
+    "@qianmo-family-insurance/env": "workspace:*",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@qianmo-family-insurance/config": "workspace:*",
+    "@types/node": "^22.13.14",
+    "turbo": "^2.9.16",
+    "typescript": "catalog:"
+  },
+  "packageManager": "pnpm@11.1.2"
+}

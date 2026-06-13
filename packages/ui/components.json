@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "base-lyra",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/styles/globals.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@qianmo-family-insurance/ui/components",
+    "utils": "@qianmo-family-insurance/ui/lib/utils",
+    "hooks": "@qianmo-family-insurance/ui/hooks",
+    "lib": "@qianmo-family-insurance/ui/lib",
+    "ui": "@qianmo-family-insurance/ui/components"
+  },
+  "menuColor": "default",
+  "menuAccent": "subtle",
+  "registries": {}
+}
