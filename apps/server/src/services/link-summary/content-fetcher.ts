@@ -16,37 +16,61 @@ const MAX_IMAGES = 10;
 const FETCH_TIMEOUT_MS = 15000;
 // 限制正文长度，避免超长页面占用过多 AI 上下文
 const MAX_TEXT_LENGTH = 8000;
+// 限制最大跳转次数，避免重定向循环
+const MAX_REDIRECTS = 5;
 
 /**
  * 公开免费网站文章抓取：真实 fetch + HTML 解析。
  */
 export class PublicArticleFetcher implements ContentFetcher {
   async fetch(rawUrl: string): Promise<FetchedContent> {
-    const url = new URL(rawUrl);
-    await assertUrlIsSafeToFetch(url);
-
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    let url = new URL(rawUrl);
 
     let html: string;
-    try {
-      const response = await fetch(url, {
-        signal: controller.signal,
-        headers: { "user-agent": "Mozilla/5.0 (compatible; QianmoLinkSummaryBot/1.0)" },
-        redirect: "follow",
-      });
+    let finalUrl = url;
+    for (let redirectCount = 0; ; redirectCount++) {
+      await assertUrlIsSafeToFetch(url);
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          signal: controller.signal,
+          headers: { "user-agent": "Mozilla/5.0 (compatible; QianmoLinkSummaryBot/1.0)" },
+          redirect: "manual",
+        });
+      } finally {
+        clearTimeout(timeout);
+      }
+
+      if (response.status >= 300 && response.status < 400) {
+        const location = response.headers.get("location");
+        if (!location) {
+          throw new Error(`抓取失败，重定向缺少 Location 头（HTTP ${response.status}）`);
+        }
+        if (redirectCount >= MAX_REDIRECTS) {
+          throw new Error("抓取失败，重定向次数过多");
+        }
+        // 每一跳重定向都需重新校验，避免跳转到内网地址（SSRF）
+        url = new URL(location, url);
+        continue;
+      }
+
       if (!response.ok) {
         throw new Error(`抓取失败，HTTP 状态码 ${response.status}`);
       }
+
+      finalUrl = url;
       html = await response.text();
-    } finally {
-      clearTimeout(timeout);
+      break;
     }
 
     return {
       title: extractTitle(html),
       text: extractText(html),
-      images: extractImages(html, url).slice(0, MAX_IMAGES),
+      images: extractImages(html, finalUrl).slice(0, MAX_IMAGES),
     };
   }
 }

@@ -18,4 +18,13 @@
 ## 后续待办（非阻断）
 
 - 真实接入公众号/小红书/抖音/B站抓取服务时，仅需新增 `ContentFetcher` 实现并替换 `getContentFetcher` 中对应分支，无需改动路由/队列/AI总结层。
-- 当前未编写自动化测试（单元/集成），建议后续为 `detectSourceType`、`ssrf-guard`、API 路由补充测试。
+- API 路由（`link-summaries.ts`）的鉴权失败/参数校验/业务错误码分支尚未补充测试，后续可补充。
+
+## 补充自动化测试与 codex 复审（本轮）
+
+- 为 `detect-source-type.ts`、`ssrf-guard.ts` 新增 Vitest 测试（`apps/server`，`pnpm add -D vitest` + `package.json` 增加 `test` 脚本）。
+- 测试过程中发现并修复了两个真实问题：
+  1. `detectSourceType` 用 `host.endsWith("xiaohongshu.com")` 等方式匹配域名，存在仿冒域名（如 `evilxiaohongshu.com`）误判风险，改为 `host === domain || host.endsWith("." + domain)`。
+  2. `assertUrlIsSafeToFetch` 对 IPv6 字面量（`URL.hostname` 带方括号，如 `[::1]`）未被 `net.isIP` 识别，导致直接走 DNS 解析分支而绕过私有地址校验；修复为先去除方括号再判断，并补充了 `::ffff:a.b.c.d`（IPv4-mapped）、`::`、`ff00::/8`（多播）、`fe80::/10`（link-local）等地址段的校验。
+  3. `content-fetcher.ts` 中 `PublicArticleFetcher` 原先使用 `redirect: "follow"`，重定向目标未经过 SSRF 校验；改为 `redirect: "manual"` 手动跟随，每一跳都重新调用 `assertUrlIsSafeToFetch`，并限制最大跳转次数（5）。
+- **已知残留风险（codex 复审标记为阻断，本轮未修复）**：`assertUrlIsSafeToFetch` 是"先 DNS 解析校验、再让 `fetch` 自行解析连接"的两阶段模式，存在 DNS rebinding/TOCTOU 风险——攻击者控制的域名可在校验时返回公网 IP、在 `fetch` 实际连接时返回内网 IP。彻底修复需要将校验阶段解析到的 IP "钉住"并用于实际连接（例如基于 `undici` 自定义 `Agent`/`dispatcher` 的 `lookup`，并正确设置 TLS SNI/Host），属于较大改动，本轮未实现，建议作为独立任务跟进。

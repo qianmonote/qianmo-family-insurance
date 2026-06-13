@@ -39,21 +39,22 @@ export function detectSourceType(rawUrl: string): LinkSummarySourceType | null {
   }
 
   const host = url.hostname.toLowerCase();
+  const isDomain = (domain: string) => host === domain || host.endsWith(`.${domain}`);
 
-  if (host.endsWith("mp.weixin.qq.com") || host === "weixin.qq.com") {
+  if (isDomain("weixin.qq.com")) {
     return "wechat_article";
   }
 
-  if (host.endsWith("xiaohongshu.com") || host.endsWith("xhslink.com")) {
+  if (isDomain("xiaohongshu.com") || isDomain("xhslink.com")) {
     // mock 阶段无法区分图文/视频，path 含 /video/ 视为视频，否则按图文处理
     return url.pathname.includes("/video/") ? "xiaohongshu_video" : "xiaohongshu_image";
   }
 
-  if (host.endsWith("douyin.com") || host.endsWith("iesdouyin.com")) {
+  if (isDomain("douyin.com") || isDomain("iesdouyin.com")) {
     return "douyin_video";
   }
 
-  if (host.endsWith("bilibili.com") || host.endsWith("b23.tv")) {
+  if (isDomain("bilibili.com") || isDomain("b23.tv")) {
     return "bilibili_video";
   }
 

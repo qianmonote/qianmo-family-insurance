@@ -21,9 +21,20 @@ function isPrivateOrReservedIp(ip: string): boolean {
 
   if (version === 6) {
     const lower = ip.toLowerCase();
-    if (lower === "::1") return true; // loopback
-    if (lower.startsWith("fe80:")) return true; // link-local
+    if (lower === "::1" || lower === "::") return true; // loopback / unspecified
+    if (/^fe[89ab][0-9a-f]:/.test(lower)) return true; // link-local fe80::/10
     if (lower.startsWith("fc") || lower.startsWith("fd")) return true; // unique local fc00::/7
+    if (lower.startsWith("ff")) return true; // multicast ff00::/8
+
+    // IPv4-mapped 地址（::ffff:a.b.c.d），还原为 IPv4 后递归校验
+    const mapped = lower.match(/^::ffff:([\da-f]{1,4}):([\da-f]{1,4})$/);
+    if (mapped) {
+      const high = Number.parseInt(mapped[1] ?? "0", 16);
+      const low = Number.parseInt(mapped[2] ?? "0", 16);
+      const ipv4 = `${(high >> 8) & 0xff}.${high & 0xff}.${(low >> 8) & 0xff}.${low & 0xff}`;
+      return isPrivateOrReservedIp(ipv4);
+    }
+
     return false;
   }
 
@@ -51,9 +62,11 @@ export async function assertUrlIsSafeToFetch(url: URL): Promise<void> {
     throw new UnsafeUrlError();
   }
 
-  // 若 hostname 本身就是 IP，直接校验
-  if (net.isIP(hostname)) {
-    if (isPrivateOrReservedIp(hostname)) {
+  // 若 hostname 本身就是 IP，直接校验（IPv6 字面量在 URL 中带方括号，需先去除）
+  const bareHostname =
+    hostname.startsWith("[") && hostname.endsWith("]") ? hostname.slice(1, -1) : hostname;
+  if (net.isIP(bareHostname)) {
+    if (isPrivateOrReservedIp(bareHostname)) {
       throw new UnsafeUrlError();
     }
     return;
