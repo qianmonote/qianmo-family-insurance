@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>阡陌家庭保 · 虚拟办公室</title>
+<style>
+  :root { --blue:#003ec7; --green:#25fea8; --ink:#0b1c30; --muted:#434656; --bg:#eef4ff; --desk:#d9c3a5; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg); color:var(--ink); }
+  header.top { position:sticky; top:0; z-index:10; background:rgba(238,244,255,.92); backdrop-filter:blur(10px); border-bottom:1px solid rgba(0,62,199,.15); padding:16px 24px; display:flex; align-items:center; justify-content:space-between; }
+  header.top h1 { margin:0; font-size:20px; color:var(--blue); }
+  header.top a { font-size:13px; color:var(--muted); text-decoration:none; border:1px solid rgba(0,62,199,.3); padding:6px 12px; border-radius:10px; }
+  main { max-width:1100px; margin:0 auto; padding:24px; }
+  .summary { font-size:14px; color:var(--muted); margin:0 0 18px; }
+  .floor { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; }
+  .ws { background:#fff; border:1px solid rgba(0,62,199,.12); border-radius:18px; padding:18px 16px 16px; position:relative; box-shadow:0 2px 6px rgba(11,28,48,.05); }
+  .ws .role { font-size:13px; font-weight:700; color:var(--blue); }
+  .ws[data-serial="1"] .role::after { content:" · 串行"; font-size:11px; color:#b26a00; font-weight:700; }
+  .bubble { margin:10px 0 14px; min-height:38px; background:#f4f8ff; border:1px solid rgba(0,62,199,.15); border-radius:12px; padding:8px 10px; font-size:12.5px; color:var(--muted); line-height:1.45; }
+  .avatar { display:flex; align-items:flex-end; justify-content:center; height:96px; }
+  .person { width:64px; }
+  .head { width:34px; height:34px; border-radius:50%; margin:0 auto; background:#f1c9a5; border:2px solid #e0b48b; }
+  .body { width:60px; height:42px; border-radius:14px 14px 6px 6px; margin:-4px auto 0; }
+  .desk { height:14px; border-radius:4px; background:var(--desk); margin-top:2px; }
+  .idle .body { opacity:.45; } .idle .head { opacity:.45; }
+  .footer { margin-top:22px; font-size:12px; color:#737688; }
+  /* role colors */
+  [data-agent="product"] .body{background:#9b8cff;} [data-agent="design"] .body{background:#ff9bce;}
+  [data-agent="frontend"] .body{background:#3aa0ff;} [data-agent="backend"] .body{background:#25c98a;}
+  [data-agent="qa"] .body{background:#ffb648;} [data-agent="cloud"] .body{background:#7fd3ff;}
+  [data-agent="security"] .body{background:#ff6b6b;} [data-agent="orchestrator"] .body{background:#0b1c30;}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>阡陌家庭保 · 虚拟办公室 · 数字员工</h1>
+  <a href="./workflow.html">← 工作流看板</a>
+</header>
+<main>
+  <p class="summary" data-live-summary>product-bug-fixes 当前进度 7/7；全部 Specs 汇总 36/36。当前执行：7 刷新最终工作流看板。</p>
+  <div class="floor">
+    <div class="ws" data-agent="orchestrator"><div class="role">编排者</div><div class="bubble" data-bubble>本轮调度 product-bug-fixes · 7 刷新最终工作流看板</div><div class="avatar"><div class="person"><div class="head"></div><div class="body"></div><div class="desk"></div></div></div></div>
+    <div class="ws" data-agent="product"><div class="role">产品 Agent</div><div class="bubble" data-bubble>空闲 · 等待分派</div><div class="avatar idle"><div class="person"><div class="head"></div><div class="body"></div><div class="desk"></div></div></div></div>
+    <div class="ws" data-agent="design"><div class="role">设计 Agent</div><div class="bubble" data-bubble>空闲 · 等待分派</div><div class="avatar idle"><div class="person"><div class="head"></div><div class="body"></div><div class="desk"></div></div></div></div>
+    <div class="ws" data-agent="frontend"><div class="role">前端 Agent</div><div class="bubble" data-bubble>生成文件自动提交与看板刷新脚本 · 推进中</div><div class="avatar"><div class="person"><div class="head"></div><div class="body"></div><div class="desk"></div></div></div></div>
+    <div class="ws" data-agent="backend"><div class="role">后端 Agent</div><div class="bubble" data-bubble>空闲 · 等待分派</div><div class="avatar idle"><div class="person"><div class="head"></div><div class="body"></div><div class="desk"></div></div></div></div>
+    <div class="ws" data-agent="qa"><div class="role">QA Agent</div><div class="bubble" data-bubble>workflow / 文档 / 脚本验证中</div><div class="avatar"><div class="person"><div class="head"></div><div class="body"></div><div class="desk"></div></div></div></div>
+    <div class="ws" data-agent="cloud"><div class="role">云资源 Agent</div><div class="bubble" data-bubble>AWS 自动发布闭环复核中</div><div class="avatar"><div class="person"><div class="head"></div><div class="body"></div><div class="desk"></div></div></div></div>
+    <div class="ws" data-agent="security" data-serial="1"><div class="role">安全审查 Agent</div><div class="bubble" data-bubble>Codex CLI 二进制缺失 · 已记录，未阻塞执行</div><div class="avatar idle"><div class="person"><div class="head"></div><div class="body"></div><div class="desk"></div></div></div></div>
+  </div>
+  <p class="footer" data-live-updated>最近一次 /qm:prd 刷新：2026-06-14T11:59:07.315Z（数据来源：Specs/*/tasks.md 与 .qm-status.json）</p>
+</main>
+</body>
+</html>

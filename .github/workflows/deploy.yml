@@ -1,0 +1,63 @@
+name: Deploy to AWS
+
+# 自动化远程部署：push 到 main 触发生产部署，也可手动触发指定 stage。
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "docs/workflow.md"
+      - "docs/workflow.html"
+      - "docs/office.html"
+      - "Specs/*/.qm-status.json"
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: "部署 stage"
+        required: true
+        default: "production"
+
+concurrency:
+  group: deploy-${{ github.event.inputs.stage || 'production' }}
+  cancel-in-progress: false
+
+permissions:
+  id-token: write # OIDC 假设 IAM 角色所需
+  contents: read
+
+jobs:
+  deploy:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    env:
+      STAGE: ${{ github.event.inputs.stage || 'production' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm check-types
+
+      - name: Test
+        run: pnpm -F server test
+
+      # 通过 OIDC 假设角色，无需在 GitHub 存长期 AK/SK。
+      # 在仓库 Secrets 配置 AWS_DEPLOY_ROLE_ARN（一个信任 GitHub OIDC 的 IAM 角色）。
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: SST deploy
+        run: pnpm sst deploy --stage "$STAGE"

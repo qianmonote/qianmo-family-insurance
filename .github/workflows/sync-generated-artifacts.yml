@@ -1,0 +1,36 @@
+name: Sync Generated Artifacts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Specs/**"
+      - "scripts/refresh-workflow-artifacts.mjs"
+      - ".github/workflows/sync-generated-artifacts.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Refresh workflow artifacts
+        run: node scripts/refresh-workflow-artifacts.mjs
+
+      - name: Commit generated artifacts
+        env:
+          GIT_AUTHOR_NAME: qianmo-bot
+          GIT_AUTHOR_EMAIL: qianmo-bot@users.noreply.github.com
+        run: bash scripts/commit-generated-artifacts.sh

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>虚拟办公室 · 数字员工</title>
+<style>
+  :root{
+    --bg:#0d1019; --floor:#171c28; --wall:#10141e;
+    --txt:#eaf0fb; --sub:#9aa6bd; --mut:#67718a; --line:#2a3243;
+    --pm:#ffb020; --design:#ff5fa2; --fe:#4f8cff; --be:#a05bff;
+    --qa:#37d39b; --sec:#ff5d5d; --cloud:#26c6da;
+    --skin:#f1c9a5; --skin2:#e0b08a; --shadow:0 18px 50px rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",Segoe UI,sans-serif;
+    color:var(--txt);min-height:100vh;padding:38px 22px 64px;
+    background:
+      radial-gradient(1100px 540px at 50% -8%, rgba(79,140,255,.14), transparent 60%),
+      radial-gradient(900px 520px at 100% 0%, rgba(160,91,255,.12), transparent 55%),
+      var(--bg);
+    overflow-x:hidden;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+
+  header{margin-bottom:14px}
+  .eyebrow{letter-spacing:.32em;font-size:12px;color:var(--mut);font-weight:700;display:flex;align-items:center;gap:10px;opacity:0;animation:rise .6s .05s forwards}
+  .eyebrow::before{content:"";width:24px;height:2px;background:linear-gradient(90deg,var(--fe),var(--be));border-radius:2px}
+  h1{margin:9px 0 6px;font-size:32px;font-weight:800;background:linear-gradient(92deg,#fff,#bcd0ff 55%,#ffc6e6);-webkit-background-clip:text;background-clip:text;color:transparent;opacity:0;animation:rise .6s .12s forwards}
+  .lede{color:var(--sub);font-size:14.5px;opacity:0;animation:rise .6s .2s forwards}
+  .nav{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;opacity:0;animation:rise .6s .28s forwards}
+  .nav a{font-size:12.5px;font-weight:600;text-decoration:none;color:var(--sub);background:#1a2030;border:1px solid var(--line);border-radius:999px;padding:7px 14px;transition:.25s}
+  .nav a:hover{color:#fff;border-color:#3c4a63;transform:translateY(-2px)}
+
+  /* office floor */
+  .office{
+    margin-top:26px;border-radius:26px;padding:34px 26px 30px;
+    background:
+      linear-gradient(180deg,var(--wall),transparent 22%),
+      repeating-linear-gradient(90deg,rgba(255,255,255,.012) 0 1px,transparent 1px 56px),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0 1px,transparent 1px 56px),
+      linear-gradient(180deg,#141925,var(--floor));
+    border:1px solid var(--line);box-shadow:var(--shadow);position:relative;overflow:hidden;
+  }
+  .office::before{content:"";position:absolute;inset:0 0 auto 0;height:64px;background:linear-gradient(180deg,rgba(79,140,255,.06),transparent)}
+  .room-tag{position:absolute;top:14px;right:18px;font-size:11px;letter-spacing:.2em;color:var(--mut);font-weight:700}
+
+  .desks{display:grid;grid-template-columns:repeat(4,1fr);gap:30px 22px;position:relative;z-index:2}
+  @media(max-width:980px){.desks{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:720px){.desks{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:460px){.desks{grid-template-columns:1fr}}
+
+  /* ---- one workstation ---- */
+  .ws{position:relative;display:flex;flex-direction:column;align-items:center;opacity:0;transform:translateY(24px);animation:rise .7s forwards}
+  .ws:nth-child(1){animation-delay:.20s}.ws:nth-child(2){animation-delay:.30s}
+  .ws:nth-child(3){animation-delay:.40s}.ws:nth-child(4){animation-delay:.50s}
+  .ws:nth-child(5){animation-delay:.60s}.ws:nth-child(6){animation-delay:.70s}
+  .ws:nth-child(7){animation-delay:.80s}.ws:nth-child(8){animation-delay:.90s}
+
+  /* status bubble */
+  .bubble{
+    position:relative;background:#212a3c;border:1px solid var(--line);color:var(--sub);
+    font-size:11px;padding:5px 10px;border-radius:10px;margin-bottom:10px;white-space:nowrap;
+    animation:bob 3.4s ease-in-out infinite;
+  }
+  .bubble::after{content:"";position:absolute;bottom:-5px;left:50%;transform:translateX(-50%) rotate(45deg);width:8px;height:8px;background:#212a3c;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .bubble b{color:var(--rc)}
+
+  /* character */
+  .char{position:relative;width:120px;height:96px;z-index:3}
+  .char .chair{position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);width:62px;height:18px;background:#0c1018;border-radius:0 0 14px 14px;opacity:.7}
+  .person{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);width:78px;height:86px}
+  /* body */
+  .body{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:62px;height:44px;background:var(--rc);border-radius:26px 26px 12px 12px}
+  .body::before{content:"";position:absolute;top:8px;left:50%;transform:translateX(-50%);width:14px;height:30px;background:rgba(255,255,255,.14);border-radius:8px} /* collar/zip */
+  /* arms (typing) */
+  .arm{position:absolute;bottom:6px;width:11px;height:26px;background:var(--rc);border-radius:8px;filter:brightness(.9)}
+  .arm.l{left:6px;transform-origin:top center;animation:type 0.5s ease-in-out infinite}
+  .arm.r{right:6px;transform-origin:top center;animation:type 0.5s ease-in-out infinite .25s}
+  /* neck + head */
+  .head{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);width:38px;height:38px;background:var(--skin);border-radius:50%;animation:headbob 3.4s ease-in-out infinite}
+  .hair{position:absolute;top:-3px;left:50%;transform:translateX(-50%);width:42px;height:24px;background:var(--hair,#3a2f2a);border-radius:22px 22px 0 0}
+  .eyes{position:absolute;top:18px;left:0;width:100%;display:flex;justify-content:center;gap:9px}
+  .eyes i{width:4px;height:5px;background:#2a2230;border-radius:2px;animation:blink 4s infinite}
+  .mouth{position:absolute;top:27px;left:50%;transform:translateX(-50%);width:9px;height:3px;background:#b9728a;border-radius:0 0 6px 6px}
+  /* role accessory dot on chest */
+  .badge{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);width:0;height:0;z-index:4}
+  .badge::after{content:attr(data-ic);font-size:13px}
+
+  /* desk + monitor */
+  .desk{position:relative;width:128px;height:54px;margin-top:-6px;z-index:1}
+  .deskTop{position:absolute;bottom:0;width:100%;height:12px;background:linear-gradient(180deg,#2a3142,#1c2230);border-radius:6px;box-shadow:0 6px 14px rgba(0,0,0,.4)}
+  .leg{position:absolute;bottom:-12px;width:6px;height:14px;background:#161b27;border-radius:0 0 3px 3px}
+  .leg.l{left:14px}.leg.r{right:14px}
+  .monitor{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);width:60px;height:38px;background:#0a0e16;border:2px solid #2c3447;border-radius:6px;overflow:hidden}
+  .monitor::before{content:"";position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:18px;height:8px;background:#2c3447;border-radius:0 0 4px 4px}
+  .scr{position:absolute;inset:3px;border-radius:3px;background:linear-gradient(180deg,rgba(255,255,255,.04),transparent);overflow:hidden}
+  .scr i{position:absolute;left:5px;height:2.5px;border-radius:2px;background:var(--rc);opacity:.85;animation:code 2.4s linear infinite}
+  .scr i:nth-child(1){top:6px;width:60%;animation-delay:0s}
+  .scr i:nth-child(2){top:12px;width:42%;animation-delay:.3s;opacity:.5}
+  .scr i:nth-child(3){top:18px;width:70%;animation-delay:.6s}
+  .scr i:nth-child(4){top:24px;width:34%;animation-delay:.9s;opacity:.5}
+  .glow{position:absolute;inset:-6px;border-radius:8px;background:var(--rc);filter:blur(14px);opacity:.18;animation:pulse 3s ease-in-out infinite}
+
+  .label{margin-top:16px;text-align:center}
+  .label .role{font-weight:800;font-size:14px}
+  .label .en{font-size:10.5px;letter-spacing:.14em;color:var(--mut);text-transform:uppercase;margin-top:2px}
+  .label .tag{display:inline-block;margin-top:7px;font-size:10.5px;font-weight:700;color:#0d1019;background:var(--rc);padding:2px 9px;border-radius:999px}
+  .serialTag{background:transparent!important;color:var(--sec)!important;border:1px dashed var(--sec)}
+
+  footer{margin-top:34px;text-align:center;color:var(--mut);font-size:12.5px;line-height:1.7}
+  .status{display:inline-flex;align-items:center;gap:7px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--qa);box-shadow:0 0 0 0 var(--qa);animation:beat 1.8s infinite}
+
+  @keyframes rise{to{opacity:1;transform:none}}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+  @keyframes headbob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-2px)}}
+  @keyframes type{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(8deg)}}
+  @keyframes blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+  @keyframes code{0%{transform:translateY(0);opacity:0}10%{opacity:.85}90%{opacity:.85}100%{transform:translateY(-22px);opacity:0}}
+  @keyframes pulse{0%,100%{opacity:.12}50%{opacity:.3}}
+  @keyframes beat{0%{box-shadow:0 0 0 0 var(--qa)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">虚拟办公室 · DIGITAL WORKFORCE</div>
+    <h1>数字员工工位 · 多 Agent 协同</h1>
+    <div class="lede">每个角色是一个独立 Sub-Agent，按任务并行入场、自动加载对应 Skills；安全审查保持串行。</div>
+    <nav class="nav">
+      <a href="./workflow.html">← 工作流看板</a>
+      <a href="./workflow.md">Mermaid 源图</a>
+    </nav>
+  </header>
+
+  <div class="office">
+    <div class="room-tag">FLOOR 01 · /qm:ai 协同区</div>
+    <div class="desks">
+
+      <!-- 产品 -->
+      <div class="ws" data-agent="product" style="--rc:var(--pm);--hair:#2f2723">
+        <div class="bubble" data-bubble>正在拆解 <b>Future 模块</b></div>
+        <div class="char">
+          <div class="person">
+            <div class="head"><div class="hair"></div><div class="eyes"><i></i><i></i></div><div class="mouth"></div></div>
+            <div class="arm l"></div><div class="arm r"></div>
+            <div class="body"></div>
+            <div class="badge" data-ic="📋"></div>
+          </div>
+          <div class="chair"></div>
+        </div>
+        <div class="desk">
+          <div class="glow"></div>
+          <div class="monitor"><div class="scr"><i></i><i></i><i></i><i></i></div></div>
+          <div class="deskTop"></div><span class="leg l"></span><span class="leg r"></span>
+        </div>
+        <div class="label"><div class="role">产品经理</div><div class="en">Product</div><div><span class="tag">需求 · 验收标准</span></div></div>
+      </div>
+
+      <!-- 设计 -->
+      <div class="ws" data-agent="design" style="--rc:var(--design);--hair:#241c2a">
+        <div class="bubble" data-bubble>还原 <b>Figma 设计稿</b></div>
+        <div class="char">
+          <div class="person">
+            <div class="head"><div class="hair" style="width:46px;height:30px;border-radius:24px 24px 10px 10px"></div><div class="eyes"><i></i><i></i></div><div class="mouth"></div></div>
+            <div class="arm l"></div><div class="arm r"></div>
+            <div class="body"></div>
+            <div class="badge" data-ic="🎨"></div>
+          </div>
+          <div class="chair"></div>
+        </div>
+        <div class="desk">
+          <div class="glow"></div>
+          <div class="monitor"><div class="scr"><i></i><i></i><i></i><i></i></div></div>
+          <div class="deskTop"></div><span class="leg l"></span><span class="leg r"></span>
+        </div>
+        <div class="label"><div class="role">设计师</div><div class="en">Design</div><div><span class="tag">UI · 还原度</span></div></div>
+      </div>
+
+      <!-- 前端 -->
+      <div class="ws" data-agent="frontend" style="--rc:var(--fe);--hair:#1d2430">
+        <div class="bubble" data-bubble>构建 <b>页面 / 组件</b></div>
+        <div class="char">
+          <div class="person">
+            <div class="head"><div class="hair"></div><div class="eyes"><i></i><i></i></div><div class="mouth"></div></div>
+            <div class="arm l"></div><div class="arm r"></div>
+            <div class="body"></div>
+            <div class="badge" data-ic="🎯"></div>
+          </div>
+          <div class="chair"></div>
+        </div>
+        <div class="desk">
+          <div class="glow"></div>
+          <div class="monitor"><div class="scr"><i></i><i></i><i></i><i></i></div></div>
+          <div class="deskTop"></div><span class="leg l"></span><span class="leg r"></span>
+        </div>
+        <div class="label"><div class="role">前端工程师</div><div class="en">Frontend</div><div><span class="tag">React · 表单</span></div></div>
+      </div>
+
+      <!-- 后端 -->
+      <div class="ws" data-agent="backend" style="--rc:var(--be);--hair:#22202c">
+        <div class="bubble" data-bubble>实现 <b>接口 / 数据模型</b></div>
+        <div class="char">
+          <div class="person">
+            <div class="head"><div class="hair"></div><div class="eyes"><i></i><i></i></div><div class="mouth"></div></div>
+            <div class="arm l"></div><div class="arm r"></div>
+            <div class="body"></div>
+            <div class="badge" data-ic="⚙️"></div>
+          </div>
+          <div class="chair"></div>
+        </div>
+        <div class="desk">
+          <div class="glow"></div>
+          <div class="monitor"><div class="scr"><i></i><i></i><i></i><i></i></div></div>
+          <div class="deskTop"></div><span class="leg l"></span><span class="leg r"></span>
+        </div>
+        <div class="label"><div class="role">后端工程师</div><div class="en">Backend</div><div><span class="tag">Hono · Drizzle</span></div></div>
+      </div>
+
+      <!-- QA -->
+      <div class="ws" data-agent="qa" style="--rc:var(--qa);--hair:#1c2a24">
+        <div class="bubble" data-bubble>校对 <b>验收标准</b></div>
+        <div class="char">
+          <div class="person">
+            <div class="head"><div class="hair"></div><div class="eyes"><i></i><i></i></div><div class="mouth"></div></div>
+            <div class="arm l"></div><div class="arm r"></div>
+            <div class="body"></div>
+            <div class="badge" data-ic="🧪"></div>
+          </div>
+          <div class="chair"></div>
+        </div>
+        <div class="desk">
+          <div class="glow"></div>
+          <div class="monitor"><div class="scr"><i></i><i></i><i></i><i></i></div></div>
+          <div class="deskTop"></div><span class="leg l"></span><span class="leg r"></span>
+        </div>
+        <div class="label"><div class="role">测试工程师</div><div class="en">QA</div><div><span class="tag">Vitest · E2E</span></div></div>
+      </div>
+
+      <!-- 云资源 -->
+      <div class="ws" data-agent="cloud" style="--rc:var(--cloud);--hair:#1a2730">
+        <div class="bubble" data-bubble>通过 <b>MCP 配置 AWS</b></div>
+        <div class="char">
+          <div class="person">
+            <div class="head"><div class="hair"></div><div class="eyes"><i></i><i></i></div><div class="mouth"></div></div>
+            <div class="arm l"></div><div class="arm r"></div>
+            <div class="body"></div>
+            <div class="badge" data-ic="☁️"></div>
+          </div>
+          <div class="chair"></div>
+        </div>
+        <div class="desk">
+          <div class="glow"></div>
+          <div class="monitor"><div class="scr"><i></i><i></i><i></i><i></i></div></div>
+          <div class="deskTop"></div><span class="leg l"></span><span class="leg r"></span>
+        </div>
+        <div class="label"><div class="role">云资源工程师</div><div class="en">Cloud / DevOps</div><div><span class="tag">MCP · AWS</span></div></div>
+      </div>
+
+      <!-- 安全（串行） -->
+      <div class="ws" data-agent="security" style="--rc:var(--sec);--hair:#2a1c1c">
+        <div class="bubble" data-bubble>对抗审查 · 找 <b>逻辑漏洞</b></div>
+        <div class="char">
+          <div class="person">
+            <div class="head"><div class="hair"></div><div class="eyes"><i></i><i></i></div><div class="mouth"></div></div>
+            <div class="arm l"></div><div class="arm r"></div>
+            <div class="body"></div>
+            <div class="badge" data-ic="🛡️"></div>
+          </div>
+          <div class="chair"></div>
+        </div>
+        <div class="desk">
+          <div class="glow"></div>
+          <div class="monitor"><div class="scr"><i></i><i></i><i></i><i></i></div></div>
+          <div class="deskTop"></div><span class="leg l"></span><span class="leg r"></span>
+        </div>
+        <div class="label"><div class="role">安全审查员</div><div class="en">Security</div><div><span class="tag serialTag">串行 · Code Review</span></div></div>
+      </div>
+
+      <!-- 编排者 -->
+      <div class="ws" data-agent="orchestrator" style="--rc:#c0c8d8;--hair:#20262f">
+        <div class="bubble" data-bubble>分派任务 · 维护 <b>工作流</b></div>
+        <div class="char">
+          <div class="person">
+            <div class="head"><div class="hair"></div><div class="eyes"><i></i><i></i></div><div class="mouth"></div></div>
+            <div class="arm l"></div><div class="arm r"></div>
+            <div class="body"></div>
+            <div class="badge" data-ic="🤖"></div>
+          </div>
+          <div class="chair"></div>
+        </div>
+        <div class="desk">
+          <div class="glow"></div>
+          <div class="monitor"><div class="scr"><i></i><i></i><i></i><i></i></div></div>
+          <div class="deskTop"></div><span class="leg l"></span><span class="leg r"></span>
+        </div>
+        <div class="label"><div class="role">编排者</div><div class="en">/qm:ai Orchestrator</div><div><span class="tag">分派 · 汇总</span></div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <p class="status" data-live-summary><span class="dot"></span> 8 名数字员工在岗 · 前 7 个角色按任务并行 · 安全审查在合并前串行介入</p>
+    <p>产出物持久化于 <b>Specs/&lt;主题&gt;/</b> · 工位状态由 <b>/qm:ai</b> 每轮更新，<b>/qm:status</b> 可随时刷新 · 与 <b>docs/workflow.html</b> / <b>workflow.md</b> 同源</p>
+    <p data-live-updated style="opacity:.7">尚未运行过 /qm:status，工位文案为初始示例</p>
+  </footer>
+</div>
+</body>
+</html>
