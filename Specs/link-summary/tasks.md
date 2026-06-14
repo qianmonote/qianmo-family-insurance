@@ -19,6 +19,9 @@
 | 13 | 前端 | 总结记录列表页 `/summary/records`：列表、状态徽章、轮询、重试按钮 | 11 | 已完成 |
 | 14 | 前端 | 记录详情页 `/summary/records/[id]`：复用 `SummaryResultCard`，processing 时轮询 | 11,12 | 已完成 |
 | 15 | 前端 | `header.tsx` 新增"一键总结"/"总结记录"导航入口（登录态可见） | 12,13 | 已完成 |
+| 16 | 后端 | 修复 SSRF 防护的 DNS rebinding/TOCTOU 风险：`assertUrlIsSafeToFetch` 改为返回校验通过的 IP，`PublicArticleFetcher` 使用该 IP "钉住"实际连接（自定义 dispatcher lookup），避免校验与连接之间域名重新解析到内网地址 | 4 | 已完成 |
+| 17 | 前端 | 补充退出登录逻辑：在旧 Header/UserMenu 与 Stitch 新风格 `QianmoTopNav` 中接入真实 `authClient.signOut`，退出成功跳转 `/login`，清理查询缓存，失败 toast 提示，并验证退出后受保护页面不可继续展示用户数据 | 8,10,15 | 已完成 |
+| 18 | 前端/测试 | 为退出登录补单测：将 `useSignOut` 的编排逻辑抽为纯函数 `runSignOut`（成功清缓存→跳 /login、失败 toast），用 vitest（node 环境，零新依赖）覆盖成功/失败两条路径与「先清缓存后跳转」顺序 | 17 | 已完成 |
 
 ## 父任务/子任务说明
 

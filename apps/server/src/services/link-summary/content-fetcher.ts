@@ -1,6 +1,7 @@
 import type { LinkSummarySourceType } from "@qianmo-family-insurance/db/schema/link-summary";
+import { Agent } from "undici";
 
-import { assertUrlIsSafeToFetch } from "./ssrf-guard";
+import { resolveSafeAddress } from "./ssrf-guard";
 
 export interface FetchedContent {
   title: string;
@@ -20,6 +21,38 @@ const MAX_TEXT_LENGTH = 8000;
 const MAX_REDIRECTS = 5;
 
 /**
+ * 创建一个将指定 hostname 的连接"钉住"到 `address` 的 dispatcher。
+ *
+ * 用于消除 SSRF 校验与实际网络连接之间的 TOCTOU/DNS rebinding 窗口：
+ * `resolveSafeAddress` 校验通过后返回的 IP 会通过此 dispatcher 直接用于建立连接，
+ * fetch 不会再对 hostname 重新发起 DNS 解析。TLS SNI/Host 头仍使用原始 hostname。
+ */
+function createPinnedDispatcher(hostname: string, address: string, family: 4 | 6): Agent {
+  return new Agent({
+    connect: {
+      // `lookup` 遵循 `dns.lookup` 回调约定：当 `options.all` 为真时返回数组形式，
+      // 否则返回单个 `(err, address, family)`。两种形式都需支持。
+      lookup: (lookupHostname, options, callback) => {
+        if (lookupHostname.toLowerCase() !== hostname) {
+          callback(
+            new Error(`unexpected hostname for pinned connection: ${lookupHostname}`),
+            // biome-ignore lint/suspicious/noExplicitAny: 错误分支的返回值类型不影响调用方
+            null as any,
+            undefined as any,
+          );
+          return;
+        }
+        if (options?.all) {
+          callback(null, [{ address, family }]);
+        } else {
+          callback(null, address, family);
+        }
+      },
+    },
+  });
+}
+
+/**
  * 公开免费网站文章抓取：真实 fetch + HTML 解析。
  */
 export class PublicArticleFetcher implements ContentFetcher {
@@ -29,42 +62,53 @@ export class PublicArticleFetcher implements ContentFetcher {
     let html: string;
     let finalUrl = url;
     for (let redirectCount = 0; ; redirectCount++) {
-      await assertUrlIsSafeToFetch(url);
+      const { address, family } = await resolveSafeAddress(url);
+      const dispatcher = createPinnedDispatcher(url.hostname.toLowerCase(), address, family);
 
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
       let response: Response;
       try {
-        response = await fetch(url, {
-          signal: controller.signal,
-          headers: { "user-agent": "Mozilla/5.0 (compatible; QianmoLinkSummaryBot/1.0)" },
-          redirect: "manual",
-        });
+        try {
+          response = await fetch(url, {
+            signal: controller.signal,
+            headers: { "user-agent": "Mozilla/5.0 (compatible; QianmoLinkSummaryBot/1.0)" },
+            redirect: "manual",
+            // @ts-expect-error -- dispatcher is a Node/undici fetch extension not in the lib.dom types
+            dispatcher,
+          });
+        } finally {
+          clearTimeout(timeout);
+        }
+
+        if (response.status >= 300 && response.status < 400) {
+          const location = response.headers.get("location");
+          // 重定向响应体未被消费，主动取消以便 dispatcher 可以正常关闭
+          await response.body?.cancel();
+          if (!location) {
+            throw new Error(`抓取失败，重定向缺少 Location 头（HTTP ${response.status}）`);
+          }
+          if (redirectCount >= MAX_REDIRECTS) {
+            throw new Error("抓取失败，重定向次数过多");
+          }
+          // 每一跳重定向都需重新校验，避免跳转到内网地址（SSRF）
+          url = new URL(location, url);
+          continue;
+        }
+
+        if (!response.ok) {
+          await response.body?.cancel();
+          throw new Error(`抓取失败，HTTP 状态码 ${response.status}`);
+        }
+
+        finalUrl = url;
+        html = await response.text();
+        break;
       } finally {
-        clearTimeout(timeout);
+        // fetch() 在响应头到达时即 resolve，需等响应体被消费/取消后才能安全关闭 dispatcher
+        await dispatcher.close();
       }
-
-      if (response.status >= 300 && response.status < 400) {
-        const location = response.headers.get("location");
-        if (!location) {
-          throw new Error(`抓取失败，重定向缺少 Location 头（HTTP ${response.status}）`);
-        }
-        if (redirectCount >= MAX_REDIRECTS) {
-          throw new Error("抓取失败，重定向次数过多");
-        }
-        // 每一跳重定向都需重新校验，避免跳转到内网地址（SSRF）
-        url = new URL(location, url);
-        continue;
-      }
-
-      if (!response.ok) {
-        throw new Error(`抓取失败，HTTP 状态码 ${response.status}`);
-      }
-
-      finalUrl = url;
-      html = await response.text();
-      break;
     }
 
     return {

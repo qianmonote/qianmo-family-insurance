@@ -5,8 +5,6 @@ import type { FetchedContent } from "./content-fetcher";
 
 const MODEL = "claude-sonnet-4-6";
 
-const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
-
 export interface SummarizeInput extends FetchedContent {
   userPrompt?: string | null;
 }
@@ -19,6 +17,11 @@ const SYSTEM_PROMPT =
  * 调用 Claude 生成结构化总结。失败时抛出错误，由调用方写入 errorMessage。
  */
 export async function summarizeContent(input: SummarizeInput): Promise<string> {
+  if (!env.ANTHROPIC_API_KEY) {
+    throw new Error("AI 总结生成失败：请先配置 ANTHROPIC_API_KEY");
+  }
+
+  const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
   const userPromptSection = input.userPrompt
     ? `\n\n用户的定制化要求：${input.userPrompt}`
     : "";

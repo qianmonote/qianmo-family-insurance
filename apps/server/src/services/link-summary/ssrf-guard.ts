@@ -48,11 +48,24 @@ export class UnsafeUrlError extends Error {
   }
 }
 
+export interface ResolvedSafeAddress {
+  /** 校验通过、用于"钉住"实际连接的 IP 地址 */
+  address: string;
+  /** IP 地址族，4 或 6 */
+  family: 4 | 6;
+}
+
 /**
- * 校验目标 URL 是否安全可抓取：协议必须是 http/https，且解析出的所有 IP 均不在内网/保留地址段内。
+ * 校验目标 URL 是否安全可抓取，并返回校验通过的 IP 地址供调用方"钉住"实际连接。
+ *
+ * 协议必须是 http/https，且解析出的 IP 不在内网/保留地址段内。
  * 抛出 UnsafeUrlError 表示不安全，调用方应将其作为抓取失败处理。
+ *
+ * 调用方必须使用本函数返回的 `address` 建立实际连接（而不是让 fetch 重新解析 hostname），
+ * 否则会存在 DNS rebinding/TOCTOU 风险：校验时域名解析到公网 IP，
+ * 实际连接时域名已被攻击者改为指向内网 IP。
  */
-export async function assertUrlIsSafeToFetch(url: URL): Promise<void> {
+export async function resolveSafeAddress(url: URL): Promise<ResolvedSafeAddress> {
   if (url.protocol !== "http:" && url.protocol !== "https:") {
     throw new UnsafeUrlError();
   }
@@ -65,22 +78,28 @@ export async function assertUrlIsSafeToFetch(url: URL): Promise<void> {
   // 若 hostname 本身就是 IP，直接校验（IPv6 字面量在 URL 中带方括号，需先去除）
   const bareHostname =
     hostname.startsWith("[") && hostname.endsWith("]") ? hostname.slice(1, -1) : hostname;
-  if (net.isIP(bareHostname)) {
+  const literalVersion = net.isIP(bareHostname);
+  if (literalVersion) {
     if (isPrivateOrReservedIp(bareHostname)) {
       throw new UnsafeUrlError();
     }
-    return;
+    return { address: bareHostname, family: literalVersion as 4 | 6 };
   }
 
-  let addresses: string[];
+  let records: { address: string; family: number }[];
   try {
-    const records = await dns.lookup(hostname, { all: true });
-    addresses = records.map((r) => r.address);
+    records = await dns.lookup(hostname, { all: true });
   } catch {
     throw new UnsafeUrlError("链接域名无法解析");
   }
 
-  if (addresses.length === 0 || addresses.some(isPrivateOrReservedIp)) {
+  if (records.length === 0 || records.some((r) => isPrivateOrReservedIp(r.address))) {
     throw new UnsafeUrlError();
   }
+
+  const first = records[0];
+  if (!first) {
+    throw new UnsafeUrlError();
+  }
+  return { address: first.address, family: first.family as 4 | 6 };
 }

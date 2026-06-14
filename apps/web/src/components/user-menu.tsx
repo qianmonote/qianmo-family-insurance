@@ -10,12 +10,12 @@ import {
 } from "@qianmo-family-insurance/ui/components/dropdown-menu";
 import { Skeleton } from "@qianmo-family-insurance/ui/components/skeleton";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
+import { useSignOut } from "@/hooks/use-sign-out";
 import { authClient } from "@/lib/auth-client";
 
 export default function UserMenu() {
-  const router = useRouter();
+  const { signOut, isSigningOut } = useSignOut();
   const { data: session, isPending } = authClient.useSession();
 
   if (isPending) {
@@ -42,17 +42,12 @@ export default function UserMenu() {
           <DropdownMenuItem>{session.user.email}</DropdownMenuItem>
           <DropdownMenuItem
             variant="destructive"
+            disabled={isSigningOut}
             onClick={() => {
-              authClient.signOut({
-                fetchOptions: {
-                  onSuccess: () => {
-                    router.push("/");
-                  },
-                },
-              });
+              void signOut();
             }}
           >
-            Sign Out
+            {isSigningOut ? "退出中..." : "退出登录"}
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

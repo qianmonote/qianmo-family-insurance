@@ -1,35 +1,12 @@
-import { auth } from "@qianmo-family-insurance/auth";
-import { env } from "@qianmo-family-insurance/env/server";
-import { Hono } from "hono";
-import { cors } from "hono/cors";
-import { logger } from "hono/logger";
-
-import { linkSummariesRouter } from "./routes/link-summaries";
-import { recoverPendingLinkSummaryTasks } from "./services/link-summary/task-queue";
-
-const app = new Hono();
-
-app.use(logger());
-app.use(
-  "/*",
-  cors({
-    origin: env.CORS_ORIGIN,
-    allowMethods: ["GET", "POST", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  }),
-);
-
-app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
-
-app.route("/api/link-summaries", linkSummariesRouter);
-
-app.get("/", (c) => {
-  return c.text("OK");
-});
-
 import { serve } from "@hono/node-server";
 
+import { app } from "./app";
+import { recoverPendingLinkSummaryTasks } from "./services/link-summary/task-queue";
+
+/**
+ * 本地开发入口：使用 node-server 长驻监听。
+ * 生产环境（AWS Lambda）使用 src/lambda.ts，不经过此文件。
+ */
 serve(
   {
     fetch: app.fetch,
@@ -40,4 +17,6 @@ serve(
   },
 );
 
+// 仅本地单进程场景下，启动时重新入队仍处于 processing 的任务。
+// Lambda 环境改由 worker + SQS 处理，不在此恢复（见 src/lambda.ts / src/worker.ts）。
 void recoverPendingLinkSummaryTasks();

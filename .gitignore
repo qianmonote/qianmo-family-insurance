@@ -40,6 +40,11 @@ lerna-debug.log*
 .turbo
 .nx
 
+# SST
+.sst
+.open-next
+.aws-sam
+
 # Better-T-Stack
 .alchemy
 

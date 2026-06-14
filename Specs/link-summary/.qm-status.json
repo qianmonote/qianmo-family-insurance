@@ -1,0 +1,13 @@
+{
+  "topic": "link-summary",
+  "updatedAt": "2026-06-14T02:07:00+08:00",
+  "currentUnit": { "id": "18", "name": "退出登录单测", "stage": "完成（已通过 Code Review）" },
+  "agents": [
+    { "role": "前端 Agent", "agentKey": "frontend", "task": "18 抽取 runSignOut 纯函数", "stage": "实现完成", "status": "已完成" },
+    { "role": "QA Agent", "agentKey": "qa", "task": "18 退出登录单测（vitest 7/7）", "stage": "测试通过", "status": "已完成" },
+    { "role": "安全审查 Agent", "agentKey": "security", "task": "18 Code Review（修复 reject 兜底）", "stage": "复审通过", "status": "已完成" },
+    { "role": "后端 Agent", "agentKey": "backend", "task": "—", "stage": "等待", "status": "空闲" },
+    { "role": "云资源 Agent", "agentKey": "cloud", "task": "—", "stage": "等待", "status": "空闲" }
+  ],
+  "tasksSummary": { "total": 18, "done": 18, "blocked": 0 }
+}

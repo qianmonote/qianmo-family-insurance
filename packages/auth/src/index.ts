@@ -4,6 +4,16 @@ import { env } from "@qianmo-family-insurance/env/server";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 
+// 受信任来源：显式 CORS_ORIGIN（逗号分隔）+ AWS 默认域名通配（无自定义域名时）。
+const trustedOrigins = [
+  ...(env.CORS_ORIGIN ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean),
+  "https://*.cloudfront.net",
+  "https://*.lambda-url.*.on.aws",
+];
+
 export function createAuth() {
   const db = createDb();
 
@@ -13,7 +23,7 @@ export function createAuth() {
 
       schema: schema,
     }),
-    trustedOrigins: [env.CORS_ORIGIN],
+    trustedOrigins,
     emailAndPassword: {
       enabled: true,
     },

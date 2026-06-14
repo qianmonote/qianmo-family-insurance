@@ -1,0 +1,12 @@
+{
+  "topic": "login-page-fixes",
+  "updatedAt": "2026-06-14T10:11:30.000Z",
+  "currentUnit": { "id": "1-5", "name": "登录页修复（预填+切换导航+测试）", "stage": "5 标记完成" },
+  "agents": [
+    { "role": "前端 Agent", "agentKey": "frontend", "task": "1-4 demo-credentials + 表单 F1/F2", "stage": "实现", "status": "已完成" },
+    { "role": "QA Agent", "agentKey": "qa", "task": "5 质量门禁 + 单测（tsc 0 / vitest 16通过）", "stage": "质量门禁", "status": "已完成" },
+    { "role": "安全审查 Agent", "agentKey": "security", "task": "三种 Code Review（基础/对抗/Git差异）无阻断项", "stage": "Code Review", "status": "已完成" },
+    { "role": "编排者", "agentKey": "orchestrator", "task": "编排 login-page-fixes", "stage": "汇总", "status": "已完成" }
+  ],
+  "tasksSummary": { "total": 5, "done": 5, "blocked": 0 }
+}

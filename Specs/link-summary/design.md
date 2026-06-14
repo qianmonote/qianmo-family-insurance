@@ -120,6 +120,27 @@ export const linkSummarySelectSchema = createSelectSchema(linkSummary); // drizz
 - `apps/web/src/components/sign-in-form.tsx`：补充"账号不存在/密码错误"统一文案（不区分两者，文案如"邮箱或密码不正确"）
 - 两表单密码长度校验已是 `min(8)`，符合 L-1
 
+### 3.2.1 退出登录逻辑（L-3/L-5/L-6 补充）
+
+退出登录入口放在所有登录态页面的导航区域/用户菜单中，至少覆盖 `/summary`、`/summary/records`、`/summary/records/[id]` 等受保护页面。
+
+- 交互入口：
+  - 桌面端：导航右侧显示"退出登录"按钮，或在用户头像/账户菜单中提供"退出登录"菜单项。
+  - Stitch 新风格页面使用 `QianmoTopNav` / `QianmoSideNav` 时，应复用同一个退出处理函数，避免各页面重复实现。
+- 前端实现：
+  - 新增或复用 `LogoutButton` / `UserMenu` 组件。
+  - 点击后调用 `authClient.signOut`。
+  - 成功回调中执行 `router.replace("/login")`，必要时调用 TanStack Query `queryClient.clear()` 清理当前用户相关缓存。
+  - 提交期间按钮置为 loading/disabled，避免重复点击。
+  - 失败时使用 `toast.error("退出登录失败，请稍后重试")`。
+- 路由保护联动：
+  - 退出成功后 session cookie 被清除。
+  - 用户再次访问 `/summary`、`/summary/records`、详情页等受保护路径时，仍由 `apps/web/src/proxy.ts` / 全局路由保护重定向到 `/login?redirect=<原路径>`。
+- 验收标准：
+  - 已登录用户点击退出后回到 `/login`。
+  - 刷新页面后仍保持未登录状态。
+  - 退出后浏览器后退到受保护页面时，页面不能展示上一位用户的数据，应被重定向或显示未登录状态。
+
 ### 3.3 一键总结入口页 `/summary`
 
 路径：`apps/web/src/app/summary/page.tsx` + `summary-form.tsx`（client component）
@@ -164,6 +185,11 @@ export const linkSummarySelectSchema = createSelectSchema(linkSummary); // drizz
 ### 3.8 导航
 
 `apps/web/src/components/header.tsx` 增加"一键总结"、"总结记录"入口链接（登录后可见）。
+
+登录态导航还需提供"退出登录"入口：
+
+- 旧导航：在 `UserMenu` 或 Header 右侧显示退出入口。
+- Stitch 新风格导航：在 `QianmoTopNav` 右侧 `Logout` 按钮接入真实 `authClient.signOut`，不可仅保留静态按钮。
 
 ## 4. 关键业务逻辑
 

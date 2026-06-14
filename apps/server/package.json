@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
+    "@aws-sdk/client-sqs": "^3.1068.0",
     "@hono/node-server": "^1.14.4",
     "@qianmo-family-insurance/auth": "workspace:*",
     "@qianmo-family-insurance/db": "workspace:*",
@@ -20,10 +21,12 @@
     "dotenv": "catalog:",
     "drizzle-orm": "^0.45.2",
     "hono": "^4.8.2",
+    "undici": "^8.4.1",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@qianmo-family-insurance/config": "workspace:*",
+    "@types/aws-lambda": "^8.10.162",
     "@types/node": "^22.13.14",
     "tsdown": "^0.21.9",
     "tsx": "^4.19.2",
