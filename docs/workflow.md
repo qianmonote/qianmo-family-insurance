@@ -74,6 +74,6 @@ flowchart LR
     CUR[product-bug-fixes] --> TASK[当前任务 7 刷新最终工作流看板]
     TASK --> PROG[当前批次 7/7]
     PROG --> ALL[全部 Specs 36/36]
-    ALL --> TIME[更新时间 2026-06-14T11:59:07.315Z]
+    ALL --> TIME[更新时间 2026-06-16T10:49:14.883Z]
 ```
 <!-- qm:current-round:end -->
