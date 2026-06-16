@@ -5,8 +5,7 @@ import { Hono } from "hono";
 
 import type { AuthVariables } from "../middleware/auth";
 import { requireAuth } from "../middleware/auth";
-import { detectSourceType, isVideoSourceType } from "../services/link-summary/detect-source-type";
-import { enqueueLinkSummaryTask } from "../services/link-summary/task-queue";
+import { detectSourceType } from "../services/link-summary/detect-source-type";
 import { processLinkSummaryTask } from "../services/link-summary/task-processor";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -44,15 +43,8 @@ linkSummariesRouter.post("/", async (c) => {
     return c.json({ code: 50000, data: null, message: "创建任务失败" });
   }
 
-  if (isVideoSourceType(sourceType)) {
-    await db
-      .update(linkSummary)
-      .set({ status: "processing" })
-      .where(eq(linkSummary.id, record.id));
-    enqueueLinkSummaryTask(record.id);
-  } else {
-    await processLinkSummaryTask(record.id);
-  }
+  // 所有来源类型均在请求内同步处理（视频类为占位抓取，瞬时完成）。
+  await processLinkSummaryTask(record.id);
 
   const [latest] = await db.select().from(linkSummary).where(eq(linkSummary.id, record.id));
   return c.json({ code: 0, data: latest, message: "ok" });
@@ -121,15 +113,8 @@ linkSummariesRouter.post("/:id/retry", async (c) => {
     return c.json({ code: 40001, data: null, message: "仅失败的任务可重试" });
   }
 
-  if (isVideoSourceType(record.sourceType)) {
-    await db
-      .update(linkSummary)
-      .set({ status: "processing", errorMessage: null })
-      .where(eq(linkSummary.id, id));
-    enqueueLinkSummaryTask(id);
-  } else {
-    await processLinkSummaryTask(id);
-  }
+  // 同步重试（processLinkSummaryTask 内部会将状态置为 processing 并清理 errorMessage）。
+  await processLinkSummaryTask(id);
 
   const [latest] = await db.select().from(linkSummary).where(eq(linkSummary.id, id));
   return c.json({ code: 0, data: latest, message: "ok" });

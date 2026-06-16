@@ -4,16 +4,15 @@
 
 | 组件 | AWS 资源 | 说明 |
 |---|---|---|
-| 后端 API | Lambda + Function URL | Hono 应用（`apps/server/src/lambda.ts`）。用 Function URL 而非 API Gateway，规避 29s 超时 |
-| 异步视频总结 | SQS + Worker Lambda | `apps/server/src/worker.ts` 串行消费（batch=1），避免并发调用 AI 超限 |
-| 数据库 | Aurora Serverless v2 (PostgreSQL) | 置于 VPC 内，按需伸缩 |
+| 后端 API | Lambda + Function URL | Hono 应用（`apps/server/src/lambda.ts`）。用 Function URL 而非 API Gateway，规避 29s 超时；所有来源类型在请求内同步处理。**无 VPC**，Lambda 默认公网出口 |
+| 数据库 | 外部 Serverless Postgres（Neon） | VPC 外，经公网 + SSL 连接；连接串以 Secret `DatabaseUrl` 注入。省去 VPC/NAT/bastion 固定成本 |
 | 前端 | CloudFront + Lambda (OpenNext) | Next.js（`apps/web`） |
-| 敏感配置 | SST Secret | `BetterAuthSecret` / `AnthropicApiKey` |
+| 敏感配置 | SST Secret | `DatabaseUrl` / `BetterAuthSecret` / `AnthropicApiKey` |
 
 ## 架构要点
 
-- **为什么改造任务队列**：原内存队列（`task-queue.ts`）依赖进程常驻后台处理，而 Lambda 返回响应后会冻结执行环境，后台任务不会执行。生产环境通过 `VIDEO_QUEUE_URL` 环境变量切换为 SQS 投递，由独立 worker Lambda 消费。本地开发未设置该变量时回退到内存队列，行为不变。
-- **数据库连接**：Aurora 在 VPC 内，Lambda 同 VPC 访问。高并发下注意连接数，必要时引入 RDS Proxy。
+- **同步处理所有来源**：视频类来源当前为占位（mock）抓取，瞬时返回，与图文类逻辑一致，统一在 API 请求内同步处理（Lambda 5min 超时足够）。未接入真实长耗时视频解析前不引入 SQS + worker 异步设施；后续接入时再恢复异步队列（参见 git 历史中的 SQS 实现）。
+- **数据库连接**：使用 Neon（外部 Serverless Postgres），连接串以 Secret `DatabaseUrl` 注入。**务必使用 Neon 的「Pooled connection」端点**（host 含 `-pooler`）并带 `?sslmode=require`，由 Neon 内置 PgBouncer 承接 Lambda 高并发短连接，避免连接数耗尽。`pg` + `drizzle-orm/node-postgres` 连接层无需改动。
 - **无自定义域名**：CORS 与 Better-Auth `trustedOrigins` 在应用层按内置模式（`localhost` / `*.cloudfront.net` / `*.lambda-url.*.on.aws`）反射校验，`BETTER_AUTH_URL` 留空由请求推断。因此前后端无循环依赖。
   - ⚠️ **已知限制**：前端（CloudFront 域）与后端（Function URL 域）跨站，登录 Cookie 为第三方 Cookie（`SameSite=None`），部分浏览器可能拦截。**生产建议绑定自定义域名**（如 `app.example.com` + `api.example.com`），或用 CloudFront 行为把 `/api/*` 反代到 API，使前后端同域。
 
@@ -27,6 +26,8 @@
 pnpm sst install
 
 # 2. 设置密钥（生产 stage）
+#    DatabaseUrl 用 Neon 控制台的 Pooled connection 串（host 含 -pooler，带 ?sslmode=require）
+pnpm sst secret set DatabaseUrl "postgresql://USER:PWD@EP-xxx-pooler.REGION.aws.neon.tech/DB?sslmode=require" --stage production
 pnpm sst secret set BetterAuthSecret "$(openssl rand -base64 32)" --stage production
 pnpm sst secret set AnthropicApiKey "sk-ant-..." --stage production
 
@@ -37,19 +38,19 @@ pnpm sst:diff
 pnpm deploy            # = sst deploy --stage production
 ```
 
-部署完成后输出 `api` / `web` / `queue` 三个 URL。
+部署完成后输出 `api` / `web` 两个 URL。
 
 ## 数据库迁移
 
-Aurora 在 VPC 内，本地需通过 bastion 隧道连接后再迁移（两个终端）：
+Neon 在公网可达，**无需 bastion 隧道**，本地直接对生产库执行 drizzle 迁移：
 
 ```bash
-# 终端 A：开隧道（保持运行）
-pnpm sst tunnel --stage production
-
-# 终端 B：注入生产连接串并执行 drizzle 迁移
+# 把 Neon 连接串（建议用 Direct connection，非 pooled）导出后迁移
+export DATABASE_URL_PROD="postgresql://USER:PWD@EP-xxx.REGION.aws.neon.tech/DB?sslmode=require"
 pnpm db:migrate:prod
 ```
+
+> 迁移建议使用 Neon 的 **Direct connection**（host 不含 `-pooler`）；运行时 Lambda 用 **Pooled** 端点。
 
 ## 自动化部署（CI/CD）
 
@@ -65,10 +66,12 @@ pnpm db:migrate:prod
 
 本地 `git remote -v` 当前为空，因此 GitHub 远程仓库地址仍需由项目维护者绑定为 `origin`。这不会影响 GitHub Actions 在远端仓库内运行，但会影响本地直接 push / 远端联调。
 
-CI 中的密钥（`BetterAuthSecret` / `AnthropicApiKey`）通过 `sst secret set` 预先写入各 stage，部署时自动读取。
+CI 中的密钥（`DatabaseUrl` / `BetterAuthSecret` / `AnthropicApiKey`）通过 `sst secret set` 预先写入各 stage，部署时自动读取。
 
 ## 移除环境
 
 ```bash
-pnpm deploy:remove     # sst remove --stage production（production 默认 retain 数据库）
+pnpm deploy:remove     # sst remove --stage production
 ```
+
+> 数据库托管在 Neon，不由 SST 管理，`sst remove` 不会删除数据；如需销毁数据请在 Neon 控制台操作。

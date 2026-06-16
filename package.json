@@ -16,7 +16,7 @@
     "deploy": "sst deploy --stage production",
     "deploy:remove": "sst remove --stage production",
     "sst:secret": "sst secret set",
-    "db:migrate:prod": "sst shell --stage production -- pnpm -F @qianmo-family-insurance/db db:migrate",
+    "db:migrate:prod": "DATABASE_URL=\"$DATABASE_URL_PROD\" pnpm -F @qianmo-family-insurance/db db:migrate",
     "dev:web": "turbo -F web dev",
     "dev:server": "turbo -F server dev",
     "db:push": "turbo -F @qianmo-family-insurance/db db:push",

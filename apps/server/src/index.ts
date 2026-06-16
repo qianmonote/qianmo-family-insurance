@@ -17,6 +17,6 @@ serve(
   },
 );
 
-// 仅本地单进程场景下，启动时重新入队仍处于 processing 的任务。
-// Lambda 环境改由 worker + SQS 处理，不在此恢复（见 src/lambda.ts / src/worker.ts）。
+// 仅本地单进程场景下，启动时重新处理仍处于 processing 的任务。
+// Lambda 环境为同步处理（每个请求内完成），不经过此文件，无需启动恢复。
 void recoverPendingLinkSummaryTasks();

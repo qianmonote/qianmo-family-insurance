@@ -5,74 +5,12 @@ import { eq } from "drizzle-orm";
 import { processLinkSummaryTask } from "./task-processor";
 
 /**
- * 视频类总结任务的入队抽象，按运行环境切换实现：
+ * 所有来源类型（含视频类占位抓取）均由 API 请求内同步处理（见 routes/link-summaries.ts）。
+ * 视频类抓取当前为 mock，瞬时返回，Lambda 5min 超时足够，故不再引入 SQS + worker 异步设施。
+ * 后续接入真实长耗时视频解析时，再恢复异步队列（参见 git 历史中的 SQS 实现）。
  *
- * - **AWS Lambda（生产）**：设置了 `VIDEO_QUEUE_URL` 环境变量时，把任务投递到 SQS，
- *   由独立的 worker Lambda（src/worker.ts）消费处理。Lambda 在返回响应后会冻结执行环境，
- *   进程内队列的后台处理不会被执行，因此异步任务必须外置到 SQS。
- * - **本地单进程（开发）**：未设置 `VIDEO_QUEUE_URL` 时，回退到进程内内存队列，
- *   串行处理，避免并发调用 AI 超限。进程重启会清空队列（启动时扫描 processing 记录恢复）。
- */
-
-const queueUrl = process.env.VIDEO_QUEUE_URL;
-
-// ---- 进程内内存队列（本地开发回退实现）----
-const queue: string[] = [];
-let isProcessing = false;
-
-function enqueueInMemory(linkSummaryId: string): void {
-  queue.push(linkSummaryId);
-  void runQueue();
-}
-
-async function runQueue(): Promise<void> {
-  if (isProcessing) return;
-  isProcessing = true;
-
-  try {
-    let nextId = queue.shift();
-    while (nextId) {
-      await processLinkSummaryTask(nextId);
-      nextId = queue.shift();
-    }
-  } finally {
-    isProcessing = false;
-  }
-}
-
-// ---- SQS 实现（生产）----
-async function enqueueToSqs(linkSummaryId: string): Promise<void> {
-  // 动态导入，避免本地开发未安装/未使用 SQS 时引入额外冷启动成本。
-  const { SQSClient, SendMessageCommand } = await import("@aws-sdk/client-sqs");
-  const client = new SQSClient({});
-  await client.send(
-    new SendMessageCommand({
-      QueueUrl: queueUrl,
-      MessageBody: JSON.stringify({ linkSummaryId }),
-    }),
-  );
-}
-
-export function enqueueLinkSummaryTask(linkSummaryId: string): void {
-  if (queueUrl) {
-    void enqueueToSqs(linkSummaryId).catch(async (error) => {
-      // 入队失败时把记录标记为 failed，避免永久卡在 processing。
-      const message = error instanceof Error ? error.message : "任务入队失败";
-      await db
-        .update(linkSummary)
-        .set({ status: "failed", errorMessage: message })
-        .where(eq(linkSummary.id, linkSummaryId));
-    });
-    return;
-  }
-
-  enqueueInMemory(linkSummaryId);
-}
-
-/**
- * 服务启动时调用：将所有仍处于 processing 状态的记录重新加入队列，
- * 避免进程重启导致任务永久卡在 processing。
- * 仅本地单进程场景使用；Lambda 环境如需补偿，应改由定时任务扫描后重新投递 SQS。
+ * 本地开发入口（src/index.ts）启动时调用本函数：把仍处于 processing 状态的记录重新处理，
+ * 避免进程在处理中途重启导致任务永久卡在 processing。生产同步处理无需此恢复。
  */
 export async function recoverPendingLinkSummaryTasks(): Promise<void> {
   try {
@@ -82,7 +20,7 @@ export async function recoverPendingLinkSummaryTasks(): Promise<void> {
       .where(eq(linkSummary.status, "processing"));
 
     for (const record of stuckRecords) {
-      enqueueLinkSummaryTask(record.id);
+      await processLinkSummaryTask(record.id);
     }
   } catch (error) {
     // 启动时的任务恢复属于尽力而为：数据库暂不可达（如本地未执行 pnpm db:start）时，

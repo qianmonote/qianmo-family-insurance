@@ -3,13 +3,18 @@
 /**
  * 阡陌家庭保 · AWS Serverless 部署（SST v3 / ion）
  *
- * 架构：
- *   VPC ─┬─ Aurora Serverless v2 (PostgreSQL)         数据库
- *        ├─ API Function (Hono, Lambda Function URL)   同步 API + 同步类总结
- *        └─ Worker Function (SQS 消费)                 异步视频类总结
- *   SQS Queue  视频总结任务队列（worker 串行消费，batch=1 避免 AI 并发超限）
- *   Next.js (OpenNext on CloudFront + Lambda)          前端
- *   Secret: BetterAuthSecret / AnthropicApiKey         敏感配置
+ * 架构（无 VPC，全按量）：
+ *   API Function (Hono, Lambda Function URL)   同步 API（所有来源类型同步处理）
+ *   Next.js (OpenNext on CloudFront + Lambda)  前端
+ *   数据库：外部 Serverless Postgres（Neon），经公网 + SSL 连接，连接串以 Secret 注入
+ *   Secret: DatabaseUrl / BetterAuthSecret / AnthropicApiKey
+ *
+ * 数据库为何用 Neon 而非 Aurora：Neon 在 VPC 外，Lambda 无需进 VPC，可省去 NAT 网关
+ * 与 bastion 的固定月成本（约 $35–70/月），整体退化为近乎纯按量计费。Lambda 默认具备
+ * 公网出口，可直连 Neon 与抓取公开文章；故不再创建 Vpc / Aurora。
+ *
+ * 注：视频类来源当前为占位（mock）抓取，瞬时返回，统一走同步 API（5min 超时足够），
+ * 未接入真实视频解析前不引入 SQS + worker 异步设施。后续接入长耗时解析时再恢复。
  *
  * 无自定义域名：CORS 与 Better-Auth trustedOrigins 在应用层按内置模式
  * （localhost / *.cloudfront.net / *.lambda-url.*.on.aws）反射校验，
@@ -32,65 +37,28 @@ export default $config({
   },
   async run() {
     // ---- 敏感配置（通过 `pnpm sst secret set <Name> <value>` 写入，不入库）----
+    // DatabaseUrl：Neon 的连接串，建议使用其「Pooled connection」端点并带 ?sslmode=require，
+    //   形如 postgresql://<user>:<pwd>@<endpoint>-pooler.<region>.aws.neon.tech/<db>?sslmode=require
+    const databaseUrl = new sst.Secret("DatabaseUrl");
     const betterAuthSecret = new sst.Secret("BetterAuthSecret");
     const anthropicApiKey = new sst.Secret("AnthropicApiKey");
 
-    // ---- 网络与数据库 ----
-    // Aurora 需置于 VPC 内；bastion 便于本地通过 `sst tunnel` 连库做迁移/调试。
-    const vpc = new sst.aws.Vpc("Vpc", { bastion: true, nat: "managed" });
-
-    const database = new sst.aws.Aurora("Database", {
-      engine: "postgres",
-      vpc,
-      scaling: {
-        min: $app.stage === "production" ? "0.5 ACU" : "0 ACU",
-        max: $app.stage === "production" ? "4 ACU" : "1 ACU",
-      },
-    });
-
-    // Drizzle / Better-Auth 使用的标准连接串。
-    const databaseUrl = $interpolate`postgresql://${database.username}:${database.password}@${database.host}:${database.port}/${database.database}`;
-
-    // ---- 视频总结异步队列 + worker ----
-    const videoQueue = new sst.aws.Queue("VideoQueue", {
-      visibilityTimeout: "15 minutes",
-    });
-
-    videoQueue.subscribe(
-      {
-        handler: "apps/server/src/worker.handler",
-        vpc,
-        link: [database, anthropicApiKey],
-        timeout: "15 minutes",
-        memory: "1024 MB",
-        environment: {
-          DATABASE_URL: databaseUrl,
-          ANTHROPIC_API_KEY: anthropicApiKey.value,
-        },
-        nodejs: { install: ["pg"] },
-      },
-      {
-        batch: { size: 1, partialResponses: true },
-      },
-    );
-
     // ---- 后端 API（Hono on Lambda Function URL）----
     // 用 Function URL 而非 API Gateway，规避 29s 超时，让同步类总结也能在 Lambda 超时内完成。
+    // 无 VPC：Lambda 默认公网出口，直连 Neon（SSL）并抓取公开文章。
     const api = new sst.aws.Function("Api", {
       handler: "apps/server/src/lambda.handler",
-      vpc,
       url: true,
-      link: [database, videoQueue, betterAuthSecret, anthropicApiKey],
+      link: [databaseUrl, betterAuthSecret, anthropicApiKey],
       timeout: "5 minutes",
       memory: "1024 MB",
       environment: {
-        DATABASE_URL: databaseUrl,
-        VIDEO_QUEUE_URL: videoQueue.url,
+        DATABASE_URL: databaseUrl.value,
         BETTER_AUTH_SECRET: betterAuthSecret.value,
         ANTHROPIC_API_KEY: anthropicApiKey.value,
         NODE_ENV: "production",
       },
-      nodejs: { install: ["@aws-sdk/client-sqs", "pg"] },
+      nodejs: { install: ["pg"] },
     });
 
     // ---- 前端（Next.js / OpenNext）----
@@ -105,7 +73,6 @@ export default $config({
     return {
       api: api.url,
       web: web.url,
-      queue: videoQueue.url,
     };
   },
 });
