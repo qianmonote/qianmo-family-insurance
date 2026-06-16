@@ -1,0 +1,61 @@
+{
+  "id": "ui-design-restore",
+  "viewports": [
+    { "label": "mobile", "width": 375, "height": 812 },
+    { "label": "tablet", "width": 768, "height": 1024 },
+    { "label": "desktop", "width": 1440, "height": 900 }
+  ],
+  "onBeforeScript": "puppet/onBefore.js",
+  "onReadyScript": "puppet/onReady.js",
+  "scenarios": [
+    {
+      "label": "Button / default",
+      "url": "http://localhost:5173/iframe.html?id=button--default",
+      "referenceUrl": "",
+      "readySelector": "[data-testid=\"button\"]",
+      "delay": 300,
+      "misMatchThreshold": 0.1,
+      "requireSameDimensions": true
+    },
+    {
+      "label": "Button / hover",
+      "url": "http://localhost:5173/iframe.html?id=button--default",
+      "hoverSelector": "[data-testid=\"button\"]",
+      "postInteractionWait": 300,
+      "misMatchThreshold": 0.1
+    },
+    {
+      "label": "Button / disabled",
+      "url": "http://localhost:5173/iframe.html?id=button--disabled",
+      "readySelector": "[data-testid=\"button\"]",
+      "misMatchThreshold": 0.1
+    },
+    {
+      "label": "Form / default",
+      "url": "http://localhost:5173/iframe.html?id=form--default",
+      "readySelector": "form",
+      "misMatchThreshold": 0.1
+    },
+    {
+      "label": "Form / focus",
+      "url": "http://localhost:5173/iframe.html?id=form--default",
+      "clickSelector": "input[name=\"email\"]",
+      "postInteractionWait": 200,
+      "misMatchThreshold": 0.1
+    }
+  ],
+  "paths": {
+    "bitmaps_reference": "backstop_data/bitmaps_reference",
+    "bitmaps_test": "backstop_data/bitmaps_test",
+    "engine_scripts": "backstop_data/engine_scripts",
+    "html_report": "backstop_data/html_report",
+    "ci_report": "backstop_data/ci_report"
+  },
+  "report": ["browser", "CI"],
+  "engine": "puppeteer",
+  "engineOptions": { "args": ["--no-sandbox"] },
+  "asyncCaptureLimit": 5,
+  "asyncCompareLimit": 50,
+  "debug": false,
+  "debugWindow": false
+}
