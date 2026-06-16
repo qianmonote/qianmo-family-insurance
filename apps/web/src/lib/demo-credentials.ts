@@ -5,6 +5,6 @@
  * 注意：如部署到对外生产环境，建议按环境开关收敛预填行为，避免暴露演示凭证。
  */
 export const DEMO_CREDENTIALS: { email: string; password: string } = {
-  email: "demo@qianmo.family",
+  email: "demo@qianmo.com",
   password: "Qianmo123456",
 };

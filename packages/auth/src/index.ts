@@ -12,6 +12,7 @@ const trustedOrigins = [
     .filter(Boolean),
   "https://*.cloudfront.net",
   "https://*.lambda-url.*.on.aws",
+  "https://*.vercel.app",
 ];
 
 export function createAuth() {

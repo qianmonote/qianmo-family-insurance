@@ -17,6 +17,7 @@ const allowedOriginPatterns = [
   /^https?:\/\/localhost(:\d+)?$/,
   /^https:\/\/[a-z0-9-]+\.cloudfront\.net$/,
   /^https:\/\/[a-z0-9-]+\.lambda-url\.[a-z0-9-]+\.on\.aws$/,
+  /^https:\/\/[a-z0-9-]+\.vercel\.app$/,
 ];
 
 /**
