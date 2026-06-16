@@ -1,5 +1,6 @@
 import type { CreateLinkSummaryInput, LinkSummary } from "@qianmo-family-insurance/db/schema/link-summary";
-import { env } from "@qianmo-family-insurance/env/web";
+
+import { getApiBaseUrl } from "@/lib/api-base";
 
 interface ApiResponse<T> {
   code: number;
@@ -15,7 +16,7 @@ class ApiError extends Error {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${env.NEXT_PUBLIC_SERVER_URL}${path}`, {
+  const response = await fetch(`${getApiBaseUrl()}${path}`, {
     ...init,
     credentials: "include",
     headers: {
