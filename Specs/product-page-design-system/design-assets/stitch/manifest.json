@@ -1,0 +1,83 @@
+{
+  "project": {
+    "title": "Product Page Design System",
+    "id": "7307656238733134596"
+  },
+  "screens": [
+    {
+      "title": "登录页 - 阡陌家庭保 (新风格)",
+      "id": "e3cb3cf60e7e4c55a93358b38f6e6e5a",
+      "deviceType": "DESKTOP",
+      "width": 2560,
+      "height": 2048,
+      "localFiles": {
+        "html": "login-new/index.html",
+        "screenshot": "login-new/screenshot.png"
+      },
+      "source": {
+        "html": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ7Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpaCiVodG1sXzAwMDY1NDIyZWM2NGY1ODIwMDMwMjhhOGI5MGZlYmU1EgsSBxCPwc6CqR8YAZIBIwoKcHJvamVjdF9pZBIVQhM3MzA3NjU2MjM4NzMzMTM0NTk2&filename=&opi=89354086",
+        "screenshot": "https://lh3.googleusercontent.com/aida/AP1WRLvesqH_MeNOrfKEb28zKgvmaBpIuUoVqJlV7pPYxTymk0WP3SY6_mNGjTDa9t8_RFYQfeE-ktlVb1Orm_oor_bgTytsyEnon0Yz17NCcQs4un8E8LGcW2VuXlV8SYwIlpu4HHxLn-lkWyACskNNdM67xATph8-vNPpC83iWOiMp-lmwibmSr8bZtHTsPsR-2C-0INcVLvtsApD0uzTGRie3MuOjvvCE0jOKR_fOFKhPd8EDZu0n1UblOHg"
+      }
+    },
+    {
+      "title": "总结记录 - 阡陌家庭保 (新风格)",
+      "id": "d2fa75bf111442c6b9aa17960de714b1",
+      "deviceType": "DESKTOP",
+      "width": 3072,
+      "height": 2172,
+      "localFiles": {
+        "html": "summary-records-new/index.html",
+        "screenshot": "summary-records-new/screenshot.png"
+      },
+      "source": {
+        "html": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ7Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpaCiVodG1sXzAwMDY1NDIyZWNlMDQ1ZDgwN2UwMDRiNWU5MmQ5ZTZjEgsSBxCPwc6CqR8YAZIBIwoKcHJvamVjdF9pZBIVQhM3MzA3NjU2MjM4NzMzMTM0NTk2&filename=&opi=89354086",
+        "screenshot": "https://lh3.googleusercontent.com/aida/AP1WRLtmGh3yXaiJ6yjsyfDGIcIO5l3Bauve_arJj8u5NpHuTUGBeDUCywFtG8CN5WtQwCyDltkt3KdEpXpI4xnN_cULHy32ctYBxY-NQK5DclnNtTZenIgyjQo92X60F0-LPBZNXhV2eOjseVOn3ysnN_ImtAu8bxZCGgja3d3afDB6Woqjl-FSaMwbN-6BhmJ7hL8eD_xIhNm3UYjdFMaanRgogO0ZJe6F_EHnhbtYZ4XnlKa-sI_Uy5Ywnw"
+      }
+    },
+    {
+      "title": "一键总结 - 阡陌家庭保 (新风格)",
+      "id": "4644e33ef37c436494c001ecfaafb16e",
+      "deviceType": "DESKTOP",
+      "width": 2560,
+      "height": 3850,
+      "localFiles": {
+        "html": "one-click-summary-new/index.html",
+        "screenshot": "one-click-summary-new/screenshot.png"
+      },
+      "source": {
+        "html": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ7Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpaCiVodG1sXzAwMDY1NDIyZWNjOThjYmYwNTRjZGJlNTA3MTEwMDU3EgsSBxCPwc6CqR8YAZIBIwoKcHJvamVjdF9pZBIVQhM3MzA3NjU2MjM4NzMzMTM0NTk2&filename=&opi=89354086",
+        "screenshot": "https://lh3.googleusercontent.com/aida/AP1WRLs3ZWbUzYBjmAVS_GJC-_JkiBJ0u5ZdEkN2ilKKwVh0YgzV1Jp4RZvhmF3D8D_ySBWbnEaGQ7FDTDTLjKxw-B3QDsiRoN0q-amQk389ByTIVEc1JEiw0fmPVv3Q8fnyywX_IogG78VbdTQfojK8KbXmEWQabvHFuWUsPQrv2zIRxShEWwa9I6Mq34CrkGM5Uk4Nb3DnFcqu1HLeeOLtYUj2PUb9FYB0lzHp_E1L4Nj4YNiox6CVg7BQgdI"
+      }
+    },
+    {
+      "title": "总结详情 - 阡陌家庭保 (新风格)",
+      "id": "84ad1478f95243bd86d85eed5eaef6aa",
+      "deviceType": "DESKTOP",
+      "width": 2560,
+      "height": 3288,
+      "localFiles": {
+        "html": "summary-detail-new/index.html",
+        "screenshot": "summary-detail-new/screenshot.png"
+      },
+      "source": {
+        "html": "https://contribution.usercontent.google.com/download?c=CgthaWRhX2NvZGVmeBJ7Eh1hcHBfY29tcGFuaW9uX2dlbmVyYXRlZF9maWxlcxpaCiVodG1sXzAwMDY1NDIyZWNmOWEyZWQwNjM5NzE4ZWY0MWU0MWFjEgsSBxCPwc6CqR8YAZIBIwoKcHJvamVjdF9pZBIVQhM3MzA3NjU2MjM4NzMzMTM0NTk2&filename=&opi=89354086",
+        "screenshot": "https://lh3.googleusercontent.com/aida/AP1WRLve5qN0qCWXlG_9NwyYfZge4o9i5wWNQVtRM9c_8G09oUfQndCZZLHjtfvg3da7_m8pX74DB5sq6WUQIOt-AFEXLoX1LY_S0VCVa9OBmzT4ZgvFOyZfFmKk0Snloh89goMIy3qlXFH_wv5A-Utc4Rb4HXaXfCYcUJK8nON4gheoru77IgHxQ3eYIyYyM8jLG3fJccBNZcJl8JAYzhe_X6Uc-L-dZ4uvBVUXAxEYmnEDSEyGXh07iz0tdQ"
+      }
+    },
+    {
+      "title": "创建账户 - 阡陌家庭保 (新风格)",
+      "id": "create-account-new",
+      "deviceType": "DESKTOP",
+      "width": 2560,
+      "height": 2048,
+      "localFiles": {
+        "html": "../../../create-account-page/design-assets/stitch/create-account-new/index.html",
+        "screenshot": null
+      },
+      "source": {
+        "note": "由 codex 派生自 login-new 生成（stitch MCP 不可用）；截图待真实浏览器环境补采，本地暂无 screenshot.png。",
+        "derivedFrom": "login-new/index.html"
+      }
+    }
+  ]
+}

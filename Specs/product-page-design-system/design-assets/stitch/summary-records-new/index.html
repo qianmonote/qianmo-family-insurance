@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>总结记录 - 阡陌家庭保</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed-variant": "#5a00c6",
+                    "on-primary-container": "#dfe3ff",
+                    "surface-bright": "#f8f9ff",
+                    "primary-fixed-dim": "#b7c4ff",
+                    "on-secondary": "#ffffff",
+                    "surface-container-low": "#eff4ff",
+                    "primary": "#003ec7",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#eaddff",
+                    "tertiary": "#620bd3",
+                    "surface": "#f8f9ff",
+                    "on-surface-variant": "#434656",
+                    "tertiary-fixed-dim": "#d2bbff",
+                    "on-tertiary": "#ffffff",
+                    "surface-variant": "#d3e4fe",
+                    "on-error-container": "#93000a",
+                    "primary-fixed": "#dde1ff",
+                    "on-error": "#ffffff",
+                    "inverse-surface": "#213145",
+                    "surface-dim": "#cbdbf5",
+                    "on-secondary-fixed-variant": "#005232",
+                    "secondary-container": "#25fea8",
+                    "secondary-fixed": "#50ffaf",
+                    "on-secondary-container": "#007147",
+                    "tertiary-container": "#7b39ec",
+                    "surface-container-high": "#dce9ff",
+                    "on-secondary-fixed": "#002111",
+                    "on-primary-fixed": "#001452",
+                    "on-background": "#0b1c30",
+                    "secondary": "#006c44",
+                    "on-primary-fixed-variant": "#0038b6",
+                    "on-surface": "#0b1c30",
+                    "secondary-fixed-dim": "#00e293",
+                    "surface-tint": "#004ced",
+                    "on-tertiary-fixed": "#25005a",
+                    "surface-container-lowest": "#ffffff",
+                    "background": "#f8f9ff",
+                    "primary-container": "#0052ff",
+                    "error": "#ba1a1a",
+                    "inverse-primary": "#b7c4ff",
+                    "surface-container": "#e5eeff",
+                    "on-tertiary-container": "#ecdfff",
+                    "outline": "#737688",
+                    "on-primary": "#ffffff",
+                    "surface-container-highest": "#d3e4fe",
+                    "outline-variant": "#c3c5d9",
+                    "inverse-on-surface": "#eaf1ff",
+                    "status-success": "#006c44",
+                    "status-processing": "#003ec7",
+                    "status-failed": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.5rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "gutter": "24px",
+                    "sm": "12px",
+                    "container-margin": "32px",
+                    "xl": "64px",
+                    "base": "8px",
+                    "lg": "40px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "display-lg": ["IBM Plex Sans"],
+                    "body-md": ["IBM Plex Sans"],
+                    "label-sm": ["IBM Plex Sans"],
+                    "label-md": ["IBM Plex Sans"],
+                    "headline-lg": ["IBM Plex Sans"],
+                    "headline-lg-mobile": ["IBM Plex Sans"],
+                    "headline-md": ["IBM Plex Sans"],
+                    "body-lg": ["IBM Plex Sans"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                    "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f8f9ff;
+            color: #0b1c30;
+            font-family: 'IBM Plex Sans', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .status-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #eff4ff;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c3c5d9;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #737688;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md overflow-x-hidden antialiased">
+<!-- SideNavBar (from COMPONENTS_9) -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-low dark:bg-surface-container-lowest border-r border-outline-variant/20 dark:border-outline/20 shadow-sm z-40 flex flex-col gap-base p-md">
+<div class="mb-lg px-2">
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">Family Guardian</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant opacity-70">Premium Member</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="text-on-surface-variant dark:text-on-surface-variant flex items-center px-4 py-3 font-label-md text-label-md hover:bg-surface-variant/50 dark:hover:bg-surface-variant/20 transition-all duration-200 active:scale-95" href="#">
+<span class="material-symbols-outlined mr-3">analytics</span>
+<span>Summarize</span>
+</a>
+<a class="bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-xl font-bold flex items-center px-4 py-3 font-label-md text-label-md transition-all duration-150 active:scale-95 shadow-sm" href="#">
+<span class="material-symbols-outlined mr-3">history</span>
+<span>History</span>
+</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant flex items-center px-4 py-3 font-label-md text-label-md hover:bg-surface-variant/50 dark:hover:bg-surface-variant/20 transition-all duration-200 active:scale-95" href="#">
+<span class="material-symbols-outlined mr-3">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="pt-md border-t border-outline-variant/20">
+<a class="text-on-surface-variant dark:text-on-surface-variant flex items-center px-4 py-3 font-label-md text-label-md hover:bg-surface-variant/50 dark:hover:bg-surface-variant/20 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">help_outline</span>
+<span>Support</span>
+</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant flex items-center px-4 py-3 font-label-md text-label-md hover:bg-surface-variant/50 dark:hover:bg-surface-variant/20 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">person_outline</span>
+<span>Account</span>
+</a>
+</div>
+</aside>
+<main class="ml-64 min-h-screen flex flex-col">
+<!-- TopNavBar (from COMPONENTS_9) -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-container-lowest/80 backdrop-blur-xl border-b border-outline-variant/20 dark:border-outline/20 shadow-sm">
+<div class="max-w-7xl mx-auto px-container-margin flex justify-between items-center h-16">
+<div class="flex items-center gap-xl">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">阡陌家庭保</span>
+<nav class="hidden md:flex gap-md items-center">
+<a class="text-on-surface-variant dark:text-on-surface-variant font-body-md text-body-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">Home</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-body-md text-body-md hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200" href="#">Summarize</a>
+<a class="text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-body-md text-body-md" href="#">History</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:text-primary transition-colors duration-200">search</button>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:text-primary transition-colors duration-200">notifications</button>
+<div class="flex items-center gap-sm pl-2 border-l border-outline-variant/20">
+<span class="font-label-md text-label-md text-on-surface-variant">User Account</span>
+<div class="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-label-md shadow-sm">U</div>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="flex-1 mt-16 p-md lg:p-xl max-w-7xl mx-auto w-full">
+<!-- Page Title and Filters -->
+<div class="mb-lg flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<h2 class="text-display-lg text-primary">总结记录</h2>
+<p class="text-body-lg text-on-surface-variant mt-xs">管理和查看您的家庭保险内容分析历史</p>
+</div>
+<div class="flex flex-wrap gap-sm items-center">
+<!-- Search Bar -->
+<div class="relative min-w-[300px]">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-10 pr-4 py-2.5 bg-surface-container-lowest rounded-xl border border-outline-variant/50 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-body-md" placeholder="搜索标题或链接..." type="text"/>
+</div>
+<!-- Type Filter -->
+<select class="bg-surface-container-lowest border border-outline-variant/50 rounded-xl py-2.5 px-4 text-label-md font-label-md focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer hover:border-primary transition-colors">
+<option>所有类型</option>
+<option>文章</option>
+<option>视频</option>
+</select>
+<!-- Status Filter -->
+<select class="bg-surface-container-lowest border border-outline-variant/50 rounded-xl py-2.5 px-4 text-label-md font-label-md focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer hover:border-primary transition-colors">
+<option>所有状态</option>
+<option>已完成</option>
+<option>处理中</option>
+<option>已失败</option>
+</select>
+</div>
+</div>
+<!-- History List -->
+<div class="grid grid-cols-1 gap-md">
+<!-- SUCCESS ITEM -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-md flex flex-col sm:flex-row items-start sm:items-center justify-between hover:shadow-md transition-all duration-200 group">
+<div class="flex items-center gap-md flex-1">
+<div class="w-14 h-14 rounded-xl bg-secondary-container/30 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-3xl">description</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center flex-wrap gap-2">
+<h3 class="text-headline-md font-bold truncate text-on-surface">关于2024家庭重疾险新规的深度解读</h3>
+<span class="px-2 py-0.5 rounded-full bg-status-success/10 text-status-success text-[10px] font-bold tracking-wider">SUCCESS</span>
+</div>
+<div class="flex flex-wrap items-center gap-4 mt-2">
+<span class="text-label-sm font-medium text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">link</span> mp.weixin.qq.com
+                                </span>
+<span class="text-label-sm font-medium text-on-surface-variant">2024-05-20 14:30</span>
+<span class="text-label-sm font-bold bg-surface-variant/50 px-2.5 py-0.5 rounded-full text-primary">文章</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-base mt-4 sm:mt-0 w-full sm:w-auto">
+<a class="flex-1 sm:flex-none text-center bg-primary/10 text-primary font-bold text-label-md px-6 py-2.5 rounded-xl hover:bg-primary hover:text-on-primary transition-all duration-200" href="#">查看详情</a>
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors p-2.5 rounded-full hover:bg-surface-variant/20">share</button>
+</div>
+</div>
+<!-- PROCESSING ITEM -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-md flex flex-col sm:flex-row items-start sm:items-center justify-between hover:shadow-md transition-all duration-200">
+<div class="flex items-center gap-md flex-1">
+<div class="w-14 h-14 rounded-xl bg-primary-fixed/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">movie</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center flex-wrap gap-2">
+<h3 class="text-headline-md font-bold truncate text-on-surface">Bilibili: 30分钟教你如何配置全家保险方案</h3>
+<span class="px-2 py-0.5 rounded-full bg-status-processing/10 text-status-processing text-[10px] font-bold status-pulse tracking-wider">PROCESSING 70%</span>
+</div>
+<div class="flex flex-wrap items-center gap-4 mt-2">
+<span class="text-label-sm font-medium text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">link</span> bilibili.com
+                                </span>
+<span class="text-label-sm font-medium text-on-surface-variant">2024-05-20 15:45</span>
+<span class="text-label-sm font-bold bg-surface-variant/50 px-2.5 py-0.5 rounded-full text-primary">视频</span>
+</div>
+</div>
+</div>
+<div class="w-full sm:w-48 mt-4 sm:mt-0 px-2">
+<div class="flex justify-between text-[10px] font-bold text-primary mb-1">
+<span>Processing...</span>
+<span>70%</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full transition-all duration-1000 shadow-[0_0_8px_rgba(0,62,199,0.5)]" style="width: 70%"></div>
+</div>
+</div>
+</div>
+<!-- FAILED ITEM -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-md flex flex-col sm:flex-row items-start sm:items-center justify-between hover:shadow-md transition-all duration-200">
+<div class="flex items-center gap-md flex-1">
+<div class="w-14 h-14 rounded-xl bg-error-container/20 flex items-center justify-center text-error">
+<span class="material-symbols-outlined text-3xl">error</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center flex-wrap gap-2">
+<h3 class="text-headline-md font-bold truncate text-on-surface">抖音：医疗险报销避坑指南</h3>
+<span class="px-2 py-0.5 rounded-full bg-status-failed/10 text-status-failed text-[10px] font-bold tracking-wider">FAILED</span>
+</div>
+<div class="flex flex-wrap items-center gap-4 mt-2">
+<span class="text-label-sm font-medium text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">link</span> douyin.com
+                                </span>
+<span class="text-label-sm font-medium text-on-surface-variant">2024-05-19 18:20</span>
+<span class="text-label-sm font-bold bg-surface-variant/50 px-2.5 py-0.5 rounded-full text-primary">视频</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-base mt-4 sm:mt-0 w-full sm:w-auto">
+<button class="flex-1 sm:flex-none bg-primary text-on-primary px-6 py-2.5 rounded-xl text-label-md font-bold hover:bg-primary-container transition-all flex items-center justify-center gap-2 active:scale-95 shadow-sm shadow-primary/20">
+<span class="material-symbols-outlined text-[18px]">replay</span> 重试
+                        </button>
+<button class="material-symbols-outlined text-outline hover:text-error transition-colors p-2.5 rounded-full hover:bg-error-container/10">delete</button>
+</div>
+</div>
+<!-- ANOTHER SUCCESS ITEM -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-md flex flex-col sm:flex-row items-start sm:items-center justify-between hover:shadow-md transition-all duration-200 group">
+<div class="flex items-center gap-md flex-1">
+<div class="w-14 h-14 rounded-xl bg-secondary-container/30 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-3xl">description</span>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center flex-wrap gap-2">
+<h3 class="text-headline-md font-bold truncate text-on-surface">少儿平安险常见理赔争议案例汇总</h3>
+<span class="px-2 py-0.5 rounded-full bg-status-success/10 text-status-success text-[10px] font-bold tracking-wider">SUCCESS</span>
+</div>
+<div class="flex flex-wrap items-center gap-4 mt-2">
+<span class="text-label-sm font-medium text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">link</span> mp.weixin.qq.com
+                                </span>
+<span class="text-label-sm font-medium text-on-surface-variant">2024-05-18 09:12</span>
+<span class="text-label-sm font-bold bg-surface-variant/50 px-2.5 py-0.5 rounded-full text-primary">文章</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-base mt-4 sm:mt-0 w-full sm:w-auto">
+<a class="flex-1 sm:flex-none text-center bg-primary/10 text-primary font-bold text-label-md px-6 py-2.5 rounded-xl hover:bg-primary hover:text-on-primary transition-all duration-200" href="#">查看详情</a>
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors p-2.5 rounded-full hover:bg-surface-variant/20">share</button>
+</div>
+</div>
+</div>
+<!-- Pagination -->
+<div class="mt-xl flex justify-center items-center gap-2">
+<button class="p-2 rounded-xl border border-outline-variant/50 text-on-surface-variant hover:bg-primary hover:text-on-primary hover:border-primary disabled:opacity-30 transition-all">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 rounded-xl bg-primary text-on-primary font-bold shadow-md shadow-primary/20">1</button>
+<button class="w-10 h-10 rounded-xl border border-outline-variant/50 text-on-surface-variant font-medium hover:border-primary hover:text-primary transition-all">2</button>
+<button class="w-10 h-10 rounded-xl border border-outline-variant/50 text-on-surface-variant font-medium hover:border-primary hover:text-primary transition-all">3</button>
+<span class="px-2 text-outline-variant">...</span>
+<button class="w-10 h-10 rounded-xl border border-outline-variant/50 text-on-surface-variant font-medium hover:border-primary hover:text-primary transition-all">12</button>
+<button class="p-2 rounded-xl border border-outline-variant/50 text-on-surface-variant hover:bg-primary hover:text-on-primary hover:border-primary transition-all">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Footer (from COMPONENTS_9) -->
+<footer class="mt-auto border-t border-outline-variant/30 bg-surface-container-highest dark:bg-surface-container">
+<div class="max-w-7xl mx-auto px-container-margin py-xl flex flex-col md:flex-row justify-between items-center gap-md">
+<div class="flex flex-col md:flex-row items-center gap-md">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">阡陌家庭保</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant opacity-80">© 2024 Qianmo Family Protect. All rights reserved.</span>
+</div>
+<div class="flex flex-wrap justify-center gap-md">
+<a class="text-on-surface-variant dark:text-on-surface-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed-dim underline transition-opacity opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed-dim underline transition-opacity opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed-dim underline transition-opacity opacity-80 hover:opacity-100" href="#">Legal Disclaimer</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed-dim underline transition-opacity opacity-80 hover:opacity-100" href="#">Contact Us</a>
+</div>
+</div>
+</footer>
+</main>
+<script>
+        // Micro-interactions for retry and UI feedback
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                if (this.innerText.includes('重试')) {
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">sync</span> 重试中...';
+                    this.disabled = true;
+                    this.classList.add('opacity-80', 'cursor-not-allowed');
+                    
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                        this.classList.remove('opacity-80', 'cursor-not-allowed');
+                        alert('已提交重试请求，正在重新分析中...');
+                    }, 1500);
+                }
+            });
+        });
+    </script>
+</body></html>

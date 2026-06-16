@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed-variant": "#5a00c6",
+                        "on-primary-container": "#dfe3ff",
+                        "surface-bright": "#f8f9ff",
+                        "primary-fixed-dim": "#b7c4ff",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "primary": "#003ec7",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#eaddff",
+                        "tertiary": "#620bd3",
+                        "surface": "#f8f9ff",
+                        "on-surface-variant": "#434656",
+                        "tertiary-fixed-dim": "#d2bbff",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#d3e4fe",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#dde1ff",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#213145",
+                        "surface-dim": "#cbdbf5",
+                        "on-secondary-fixed-variant": "#005232",
+                        "secondary-container": "#25fea8",
+                        "secondary-fixed": "#50ffaf",
+                        "on-secondary-container": "#007147",
+                        "tertiary-container": "#7b39ec",
+                        "surface-container-high": "#dce9ff",
+                        "on-secondary-fixed": "#002111",
+                        "on-primary-fixed": "#001452",
+                        "on-background": "#0b1c30",
+                        "secondary": "#006c44",
+                        "on-primary-fixed-variant": "#0038b6",
+                        "on-surface": "#0b1c30",
+                        "secondary-fixed-dim": "#00e293",
+                        "surface-tint": "#004ced",
+                        "on-tertiary-fixed": "#25005a",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#f8f9ff",
+                        "primary-container": "#0052ff",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#b7c4ff",
+                        "surface-container": "#e5eeff",
+                        "on-tertiary-container": "#ecdfff",
+                        "outline": "#737688",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#d3e4fe",
+                        "outline-variant": "#c3c5d9",
+                        "inverse-on-surface": "#eaf1ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "gutter": "24px",
+                        "sm": "12px",
+                        "container-margin": "32px",
+                        "xl": "64px",
+                        "base": "8px",
+                        "lg": "40px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["IBM Plex Sans"],
+                        "body-md": ["IBM Plex Sans"],
+                        "label-sm": ["IBM Plex Sans"],
+                        "label-md": ["IBM Plex Sans"],
+                        "headline-lg": ["IBM Plex Sans"],
+                        "headline-lg-mobile": ["IBM Plex Sans"],
+                        "headline-md": ["IBM Plex Sans"],
+                        "body-lg": ["IBM Plex Sans"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                        "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #f8f9ff;
+            font-family: 'IBM Plex Sans', sans-serif;
+            color: #0b1c30;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+        .summary-card {
+            background: #ffffff;
+            border: 1px solid rgba(195, 197, 217, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .summary-card:hover {
+            box-shadow: 0 12px 24px -8px rgba(0, 82, 255, 0.12);
+            transform: translateY(-2px);
+            border-color: #0052ff;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex">
+<!-- Updated SideNavBar according to COMPONENTS_9 -->
+<aside class="fixed left-0 top-0 h-full w-64 z-40 flex flex-col bg-surface-container-low dark:bg-surface-container-lowest border-r border-outline-variant/20 shadow-sm font-label-md text-label-md">
+<div class="p-md">
+<h1 class="text-headline-md font-bold text-primary">Family Guardian</h1>
+<p class="text-label-sm opacity-70 mt-xs">Data Management</p>
+</div>
+<div class="px-md mb-base">
+<button class="w-full bg-primary text-on-primary py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:shadow-lg active:scale-95 transition-all duration-150">
+<span class="material-symbols-outlined">add</span>
+<span>New Entry</span>
+</button>
+</div>
+<nav class="flex-1 px-md flex flex-col gap-base mt-4">
+<a class="flex items-center gap-sm text-on-surface-variant px-4 py-3 hover:bg-surface-variant/50 transition-all duration-200 rounded-xl" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span>Summarize</span>
+</a>
+<a class="bg-secondary-container text-on-secondary-container rounded-xl font-bold flex items-center px-4 py-3" href="#">
+<span class="material-symbols-outlined mr-sm" style="font-variation-settings: 'FILL' 1;">history</span>
+<span>History</span>
+</a>
+<a class="flex items-center gap-sm text-on-surface-variant px-4 py-3 hover:bg-surface-variant/50 transition-all duration-200 rounded-xl" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-outline-variant/20 p-md flex flex-col gap-base">
+<a class="flex items-center gap-sm text-on-surface-variant px-4 py-3 hover:bg-surface-variant/50 transition-all duration-200 rounded-xl" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-sm text-on-surface-variant px-4 py-3 hover:bg-surface-variant/50 transition-all duration-200 rounded-xl" href="#">
+<span class="material-symbols-outlined">person_outline</span>
+<span>Account</span>
+</a>
+</div>
+</aside>
+<main class="ml-64 flex-1 flex flex-col min-h-screen">
+<!-- Updated TopNavBar (Integrated as Content Header) -->
+<header class="bg-surface/80 backdrop-blur-xl border-b border-outline-variant/20 sticky top-0 z-50 shadow-sm h-16">
+<div class="max-w-7xl mx-auto px-container-margin flex justify-between items-center h-full">
+<div class="flex items-center gap-md">
+<button class="text-primary hover:bg-primary/5 p-2 rounded-full transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined">arrow_back</span>
+<span class="text-label-md font-bold">返回列表</span>
+</button>
+<div class="h-6 w-[1px] bg-outline-variant/30"></div>
+<span class="text-headline-md font-bold text-on-surface">报告详情</span>
+</div>
+<div class="flex items-center gap-md">
+<button class="bg-primary text-on-primary px-6 py-2 rounded-full text-label-md font-bold hover:shadow-md hover:scale-[1.02] transition-all">
+                    分享报告
+                </button>
+<div class="flex items-center gap-sm">
+<button class="text-on-surface-variant hover:bg-surface-variant/50 p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-variant/50 p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="flex-1 w-full max-w-7xl mx-auto p-container-margin">
+<!-- Summary Header Section -->
+<section class="mb-xl bg-white border border-outline-variant/20 rounded-xl p-8 flex flex-col md:flex-row gap-8 items-start shadow-sm">
+<div class="w-full md:w-1/3 aspect-video rounded-lg overflow-hidden relative border border-outline-variant/10 group">
+<img alt="Digital workspace with tablet" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUFeT3oSm5JM4e3WOQaAbXzMdon-ziZ_3ES__hSZUqTtgu4JLCHR3tPxGYqlQHc9h_z4QSHlrOFWM9-tACspR3ak9kT7MOC87NDg8aFByDWvN5xMOyyAP1acbEzTU1SKESsLDT_Y9m1f1C7dZxe2pVvi12Td4a6_4Itfc_5ZTr8OvMqhf8ON9AcYspuLZoH2dhLRp9wsmjScoi5G31HgzC3k9qDyadxy-nLh-k1fUgE2Mwe1lMgqwf"/>
+<div class="absolute inset-0 bg-primary/5 mix-blend-multiply"></div>
+<div class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm border border-white">
+<span class="material-symbols-outlined text-[18px] text-primary" style="font-variation-settings: 'FILL' 1;">video_library</span>
+<span class="text-label-sm font-bold text-primary">视频分析</span>
+</div>
+</div>
+<div class="flex-1 space-y-4">
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 rounded-full text-secondary bg-secondary-container/50 text-[11px] font-bold uppercase tracking-wide border border-secondary/20">AI Generated</span>
+<span class="px-3 py-1 rounded-full text-primary bg-primary-container/20 text-[11px] font-bold uppercase tracking-wide border border-primary/20">Verified</span>
+</div>
+<h2 class="text-display-lg leading-tight text-on-background">2024年全球宏观经济趋势与家庭资产配置策略分析</h2>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<div class="flex items-center gap-1.5 px-3 py-1 bg-surface-container-low rounded-full">
+<span class="material-symbols-outlined text-[18px]">link</span>
+<a class="text-label-md hover:text-primary transition-colors underline" href="#">source_finance_video_0821.mp4</a>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-1 bg-surface-container-low rounded-full">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span class="text-label-md">18:42 视频长度</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Detailed Analysis Bento Grid -->
+<div class="bento-grid">
+<!-- Main Summary Body -->
+<div class="col-span-12 lg:col-span-8 space-y-6">
+<div class="summary-card rounded-xl p-8">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 bg-primary-container rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container">star_rate</span>
+</div>
+<h3 class="text-headline-md font-bold text-on-surface">核心要点 (Core Highlights)</h3>
+</div>
+<ul class="space-y-6">
+<li class="flex gap-4 items-start p-4 rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="mt-1 flex-shrink-0 w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold shadow-md shadow-primary/20">1</div>
+<div class="space-y-1">
+<p class="text-body-lg font-bold text-on-background">全球通胀压力缓解与降息预期</p>
+<p class="text-body-md text-on-surface-variant">分析指出，美联储可能在下半年进入降息周期，这将显著影响跨境资产的收益结构。建议关注固定收益类产品的重新定价风险。</p>
+</div>
+</li>
+<li class="flex gap-4 items-start p-4 rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="mt-1 flex-shrink-0 w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold shadow-md shadow-primary/20">2</div>
+<div class="space-y-1">
+<p class="text-body-lg font-bold text-on-background">防御性资产的价值回归</p>
+<p class="text-body-md text-on-surface-variant">在波动加剧的市场环境中，黄金与高股息股票展现出更强的抗风险能力。家庭资产中此类资产占比建议提升至 15%-20%。</p>
+</div>
+</li>
+<li class="flex gap-4 items-start p-4 rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="mt-1 flex-shrink-0 w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold shadow-md shadow-primary/20">3</div>
+<div class="space-y-1">
+<p class="text-body-lg font-bold text-on-background">新兴市场科技板块潜力</p>
+<p class="text-body-md text-on-surface-variant">AI技术带动的硬件供应链依然是长期增长的核心驱动力，特别是在亚太地区的半导体封装与测试环节。</p>
+</div>
+</li>
+</ul>
+</div>
+<div class="summary-card rounded-xl p-8">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 bg-secondary-container rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container">analytics</span>
+</div>
+<h3 class="text-headline-md font-bold text-on-surface">详细分析 (Detailed Analysis)</h3>
+</div>
+<div class="prose max-w-none text-body-md text-on-surface-variant space-y-6">
+<p class="leading-relaxed">
+                            报告深入探讨了当前地缘政治局势对能源价格的潜在冲击。通过对过去十年的历史数据建模，AI预测未来六个月内全球供应链成本将保持在 <b class="text-primary font-bold">+/- 5%</b> 的波动区间内。
+                        </p>
+<p class="leading-relaxed">
+                            针对家庭保险方案，建议审视现有的“全球医疗险”条款，特别是关于紧急撤离与跨国医疗协作的响应速度。由于宏观政策变动，部分地区的承保范围可能面临调整。
+                        </p>
+<div class="bg-surface-container-low p-6 rounded-xl border-l-4 border-primary relative overflow-hidden">
+<div class="absolute top-0 right-0 p-2 opacity-5">
+<span class="material-symbols-outlined text-[64px]">tips_and_updates</span>
+</div>
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary">lightbulb</span>
+<p class="text-label-md font-bold text-primary uppercase">专家建议</p>
+</div>
+<p class="text-body-lg italic text-on-surface">“资产配置的精髓不在于预测风向，而在于构建一艘无论风向如何都能稳行致远的航船。目前环境下，现金流的稳定性高于资本增值的速度。”</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Metadata Sidebar -->
+<div class="col-span-12 lg:col-span-4 space-y-6">
+<div class="summary-card rounded-xl p-6">
+<h4 class="text-label-md font-bold text-on-surface mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">info</span>
+                        报告元数据
+                    </h4>
+<div class="space-y-4">
+<div class="flex justify-between items-center py-3 border-b border-outline-variant/10">
+<span class="text-body-sm text-on-surface-variant">生成日期</span>
+<span class="text-label-md font-bold text-on-surface">2024年10月24日</span>
+</div>
+<div class="flex justify-between items-center py-3 border-b border-outline-variant/10">
+<span class="text-body-sm text-on-surface-variant">处理用时</span>
+<span class="text-label-md font-bold text-on-surface">1.2 秒</span>
+</div>
+<div class="flex justify-between items-center py-3 border-b border-outline-variant/10">
+<span class="text-body-sm text-on-surface-variant">来源类型</span>
+<span class="text-label-md font-bold text-on-surface">MP4 视频文件</span>
+</div>
+<div class="flex justify-between items-center py-3 border-b border-outline-variant/10">
+<span class="text-body-sm text-on-surface-variant">字数统计</span>
+<span class="text-label-md font-bold text-on-surface">1,240 字</span>
+</div>
+<div class="flex flex-col gap-2 py-3">
+<div class="flex justify-between items-center">
+<span class="text-body-sm text-on-surface-variant">置信度评分</span>
+<span class="text-label-md font-bold text-secondary">98%</span>
+</div>
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="w-[98%] h-full bg-secondary shadow-[0_0_8px_rgba(37,254,168,0.5)]"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="summary-card rounded-xl p-6 bg-primary-container/10 border-primary/20">
+<div class="flex items-center gap-2 mb-4">
+<div class="p-2 bg-primary-container rounded-lg">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<h4 class="text-label-md font-bold text-primary">AI 洞察推荐</h4>
+</div>
+<p class="text-body-sm mb-6 text-on-surface-variant">根据这份摘要，我们为您发现了一个潜在的风险缺口：您目前的家庭意外险不包含海外急难援助。</p>
+<button class="w-full bg-secondary-fixed text-on-secondary-fixed py-3 rounded-xl text-label-md font-bold hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all duration-200">
+                        更新保险方案
+                    </button>
+</div>
+<div class="flex flex-col gap-3">
+<button class="flex items-center justify-center gap-2 w-full border-2 border-primary text-primary py-3 rounded-xl text-label-md font-bold hover:bg-primary/5 transition-all active:scale-95">
+<span class="material-symbols-outlined">download</span>
+                        下载 PDF 报告
+                    </button>
+<button class="flex items-center justify-center gap-2 w-full border border-error text-error py-3 rounded-xl text-label-md font-bold hover:bg-error/5 transition-all active:scale-95">
+<span class="material-symbols-outlined">delete</span>
+                        删除此条记录
+                    </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Updated Footer according to COMPONENTS_9 -->
+<footer class="mt-auto border-t border-outline-variant/30 bg-surface-container-highest dark:bg-surface-container">
+<div class="max-w-7xl mx-auto px-container-margin py-xl flex flex-col md:flex-row justify-between items-center gap-md font-label-sm text-label-sm">
+<p class="text-on-surface-variant">© 2024 阡陌家庭保 Family Guardian. All rights reserved.</p>
+<div class="flex gap-md flex-wrap justify-center">
+<a class="text-on-surface-variant hover:text-primary hover:underline transition-all opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary hover:underline transition-all opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary hover:underline transition-all opacity-80 hover:opacity-100" href="#">Legal Disclaimer</a>
+<a class="text-on-surface-variant hover:text-primary hover:underline transition-all opacity-80 hover:opacity-100" href="#">Contact Us</a>
+</div>
+</div>
+</footer>
+</main>
+<script>
+    // Micro-interactions
+    document.querySelectorAll('button, a').forEach(el => {
+        el.addEventListener('mousedown', () => {
+            if (!el.classList.contains('active:scale-95')) {
+                el.style.transform = 'scale(0.98)';
+            }
+        });
+        el.addEventListener('mouseup', () => {
+            if (!el.classList.contains('active:scale-95')) {
+                el.style.transform = 'scale(1)';
+            }
+        });
+        el.addEventListener('mouseleave', () => {
+            if (!el.classList.contains('active:scale-95')) {
+                el.style.transform = 'scale(1)';
+            }
+        });
+    });
+</script>
+</body></html>
